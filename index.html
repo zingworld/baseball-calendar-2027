@@ -298,8 +298,6 @@ p{margin:0;line-height:1.55}
 .opC{display:inline-flex;align-items:center;gap:.12em;border-radius:.3em;box-shadow:none;overflow:visible}
 .opC b{width:.8em;height:.8em;border-radius:50%;background:var(--c);box-shadow:0 .05em .15em rgba(0,0,0,.3)}
 .opC i{font-size:.42em;background:#fff;border:.12em solid var(--c);border-radius:.4em;padding:.25em .6em;box-shadow:0 .05em .2em rgba(0,0,0,.2)}
-.opwrap{display:flex;flex-direction:column;align-items:center;gap:1em}
-.opcell{display:flex;align-items:center;gap:.6em;font-size:.75em}
 .opgrid{display:grid;grid-template-columns:repeat(5,auto);gap:.7em .8em;align-items:center;justify-items:center}
 /* sticker sheet */
 .sheet{background:var(--p-sheet);border-radius:.6em;padding:.9em;box-shadow:0 .4em 1em -.5em rgba(0,0,0,.45);display:flex;flex-direction:column;gap:.55em;width:19em;color:var(--p-ink)}
@@ -448,8 +446,8 @@ function result(style,r,team){
 }
 function oppMock(o){
   var h='<div class="opgrid">'+OPP.map(function(c,i){return logo(i,' style="width:2.4em"',o.opp)}).join("")+'</div>';
-  var cell='<div class="opcell"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(3,' style="width:2.1em"',o.opp)+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
-  return '<div class="mk"><div class="opwrap">'+h+cell+'</div></div>';
+  var cell='<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(3,' style="width:2.1em"',o.opp)+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
+  return '<div class="mk"><div style="margin-left:5em">'+h+'</div></div>'+cell;
 }
 function cornerMock(o){
   return '<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(7,' style="width:2.1em;height:2.1em"',o.opp)+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
@@ -616,7 +614,7 @@ function haMock(o){
 function cur(){return {top:v("top"),bottom:v("bottom"),opp:v("opp"),homeaway:v("homeaway"),layout:v("layout"),mood:v("mood"),sticker:v("sticker"),pack:v("pack"),material:v("material")}}
 function mockFor(key,opt){
   var o=cur(); o[key]=opt;
-  if(key==="opp") return {html:oppMock(o),size:(o.opp===3?.95:1.2)};
+  if(key==="opp") return {html:oppMock(o),size:1.2};
   if(key==="homeaway") return {html:haMock(o),size:1.3};
   if(key==="top"||key==="bottom") return {html:sideMock(o,key),size:1.02};
   if(key==="mood") return {html:calMock(o),size:.74};
