@@ -594,7 +594,7 @@ function mockFor(key,opt){
   if(key==="top"||key==="bottom") return {html:sideMock(o,key),size:1.02};
   if(key==="mood") return {html:calMock(o),size:.74};
   if(key==="sticker") return {html:resultMock(o)+cornerMock(o),size:1.6};
-  if(key==="pack") return {html:packMock(o),size:(o.pack===3?1.05:1.2)};
+  if(key==="pack") return {html:packMock(o),size:(o.pack===1?1.2:o.pack===2?.95:.78)};
   return {html:materialMock(o),size:1.7};
 }
 
