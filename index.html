@@ -290,6 +290,15 @@ p{margin:0;line-height:1.55}
 .jump:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .in{top:5cqi!important}
 @media (max-width:760px){.jump{position:static;display:block;margin:20px 14px -8px auto;font-size:12px;padding:4px 12px}}
+.op{display:inline-grid;place-items:center;flex:none;border-radius:50%;box-shadow:0 .08em .2em rgba(0,0,0,.3);position:relative;overflow:hidden;line-height:1}
+.op i{font-style:normal;font-family:var(--hand);font-weight:700;color:#333;white-space:nowrap}
+.opA{background:#fff;border:.2em solid var(--c)}
+.opB{background:linear-gradient(var(--c) 0 52%,#fff 52%);border:.08em solid #fff}
+.opB i{position:absolute;left:0;right:0;bottom:.12em;text-align:center}
+.opC{display:inline-flex;align-items:center;gap:.12em;border-radius:.3em;box-shadow:none;overflow:visible}
+.opC b{width:.8em;height:.8em;border-radius:50%;background:var(--c);box-shadow:0 .05em .15em rgba(0,0,0,.3)}
+.opC i{font-size:.42em;background:#fff;border:.12em solid var(--c);border-radius:.4em;padding:.25em .6em;box-shadow:0 .05em .2em rgba(0,0,0,.2)}
+.opgrid{display:grid;grid-template-columns:repeat(5,auto);gap:.7em .8em;align-items:center;justify-items:center}
 /* sticker sheet */
 .sheet{background:var(--p-sheet);border-radius:.6em;padding:.9em;box-shadow:0 .4em 1em -.5em rgba(0,0,0,.45);display:flex;flex-direction:column;gap:.55em;width:19em;color:var(--p-ink)}
 .sheet .sh{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--num);font-weight:700;font-size:.85em;letter-spacing:.08em}
@@ -356,7 +365,13 @@ var MOODS={
   3:{name:"파스텔 다꾸",paper:"#fffaf7",ink:"#4a4766",main:"#7b78b8",accent2:"#f4a7b9",sun:"#e5809b",line:"#ece3e6",ring:"#b9b4cf",stand:"#c9c3e6",sky:"#dff0ec",field:"#a6d8c3",dirt:"#f3c6a8",sheet:"#ffffff",muted:"#9a95b0"}
 };
 var LOGO=["twins","wiz","lions","dinos","bears","tigers","giants","landers","heroes","eagles"];
-function logo(i,extra){return '<img class="em" src="stk/'+LOGO[i%LOGO.length]+'.png" alt=""'+(extra||"")+'>'}
+var OPP=[["#c8102e","서울"],["#1c2a4a","잠실"],["#111111","수원"],["#e86a1a","인천"],["#1f6fb8","대구"],["#7a1630","고척"],["#2f7d4f","창원"],["#d9a514","부산"],["#6a4fb3","광주"],["#8a8f99","대전"]];
+function logo(i,extra,variant){
+  var m=/width:([\d.]+)em/.exec(extra||""), z=m?+m[1]:1.6, c=OPP[i%OPP.length], v=variant||(typeof state!=="undefined"&&state.opp)||1;
+  if(v===1) return '<span class="op opA" style="--c:'+c[0]+';width:'+z+'em;height:'+z+'em"><i style="font-size:'+(z*.3)+'em">'+c[1]+'</i></span>';
+  if(v===2) return '<span class="op opB" style="--c:'+c[0]+';width:'+z+'em;height:'+z+'em"><i style="font-size:'+(z*.27)+'em">'+c[1]+'</i></span>';
+  return '<span class="op opC" style="--c:'+c[0]+';font-size:'+(z/1.6)+'em"><b></b><i>'+c[1]+'</i></span>';
+}
 var TEAM=["#c8102e","#0b2a5b","#e85d04","#1d6f42","#6a1b9a","#222222","#0077b6","#b08900","#8d1b3d","#5c6770"];
 
 var D=[
@@ -368,6 +383,10 @@ var D=[
    {t:"다음 달 미니 달력",d:"다음 달 날짜를 미리 보여줘요. 가장 익숙한 구성이에요.",f:[["실용성","높음"],["꾸밀 거리","적음"]]},
    {t:"나만의 MVP 선수",d:"이달 가장 잘한 선수를 직접 적고 스티커로 꾸며요.",f:[["다꾸","좋음"],["아이와 함께","좋음"]]},
    {t:"직관 · 원정 후기 메모",d:"경기장, 날짜, 한 줄 후기를 적는 칸이에요.",f:[["기록","남음"],["다꾸","보통"]]}]},
+ {key:"opp",q:"상대팀 스티커",title:"상대팀 스티커, 로고 대신 무엇으로?",hint:"구단 로고 없이 팀 컬러 원형 스티커에 팀 이름을 직접 써서 붙여요. 상표 걱정이 없어요.",opts:[
+   {t:"컬러 링 + 가운데 쓰기",d:"테두리만 팀 컬러, 가운데 흰 원에 팀 이름을 써요.",f:[["크기","지름 10mm"],["쓰는 칸","지름 6mm (2글자)"],["달력에서","가장 깔끔"]]},
+   {t:"반반 원형",d:"위는 팀 컬러, 아래 흰 칸에 이름을 써요. 색이 크게 보여요.",f:[["크기","지름 10mm"],["쓰는 칸","10 × 4mm"],["색 구분","가장 잘 보임"]]},
+   {t:"컬러 도트 + 이름 라벨",d:"작은 팀 컬러 도트에 이름 쓰는 라벨이 붙어 있어요.",f:[["크기","도트 5mm + 라벨 11 × 4.5mm"],["쓰는 칸","가장 넉넉"],["달력에서","가로로 김"]]}]},
  {key:"homeaway",q:"홈 · 원정 표시",title:"오늘 경기가 홈인지 원정인지, 어떻게 표시할까?",hint:"기본: 상대팀 스티커를 날짜 칸에 붙여 오늘 누구와 경기하는지 표시해요.",opts:[
    {t:"HOME · AWAY 글자 위에 붙이기",d:"칸마다 HOME · AWAY를 인쇄해 두고, 홈 경기면 AWAY 자리에 상대팀 스티커를 붙여요.",f:[["인쇄","칸마다 글자"],["스티커","추가 없음"],["한눈에","잘 보임"]]},
    {t:"홈 · 원정 스티커 따로",d:"HOME, AWAY 스티커를 따로 만들어 상대팀 스티커 옆에 붙여요.",f:[["인쇄","없음"],["스티커","경기당 2장"],["다꾸","재미있음"]]},
@@ -425,8 +444,13 @@ function badge(style,r){
 function result(style,r,team){
   return logo(Math.max(0,TEAM.indexOf(team)),' style="width:1.35em;height:1.35em"')+'<span class="mini-b">'+badge(style,r)+'</span>';
 }
+function oppMock(o){
+  var h='<div class="opgrid">'+OPP.map(function(c,i){return logo(i,' style="width:2.4em"',o.opp)}).join("")+'</div>';
+  var cell='<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(3,' style="width:2.1em"',o.opp)+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
+  return '<div class="mk"><div style="margin-left:5em">'+h+'</div></div>'+cell;
+}
 function cornerMock(o){
-  return '<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(7,' style="width:2.1em;height:2.1em"')+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
+  return '<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(7,' style="width:2.1em;height:2.1em"',o.opp)+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
 }
 var EVENTS=[["개막전","#c8102e"],["올스타","#b8862b"],["가을야구","#d9692b"],["직관","#1c2a4a"],["국제경기","#2f5fc4"]];
 var FANS=[["말소","#7d8591"],["등록","#2f7d4f"],["부상","#c8102e"],["대체선수","#6a4fb3"],["FA 영입","#b8862b"],["계약해지","#3a3f4a"],["계약완료","#1c2a4a"],["트레이드","#d9692b"]];
@@ -542,7 +566,7 @@ function sheetMock(o,wide){
   var ha=o.homeaway===2?sec("홈 · 원정",'<span class="hatag" style="background:'+p.main+'">HOME</span><span class="hatag" style="background:'+p.accent2+'">AWAY</span><span class="hatag" style="background:'+p.main+'">HOME</span><span class="hatag" style="background:'+p.accent2+'">AWAY</span>'):"";
   var html=sec("경기 결과",res)+ha+sec("이벤트",ev);
   html+=sec("찐팬",FANS.slice(0,4).map(function(f){return '<span class="hatag" style="background:'+f[1]+'">'+f[0]+' ___</span>'}).join(""));
-  html+=sec("상대팀 로고",TEAM.map(function(c,i){return logo(i,' style="width:1.5em;height:1.5em"')}).join(""));
+  html+=sec("상대팀 스티커",TEAM.map(function(c,i){return logo(i,' style="width:1.5em;height:1.5em"')}).join(""));
   return '<div class="mk" style="'+vars(m)+'"><div class="sheet'+(wide?" wide":"")+'"><div class="sh"><span>STICKER SHEET</span><span></span></div>'+html+'</div></div>';
 }
 function packMock(o){
@@ -587,9 +611,10 @@ function haMock(o){
   else {inner='<div class="pair"><span class="drop">'+opp+'</span></div>';cap="상대팀 스티커 한 장";}
   return '<div class="mk" style="'+vars(o.mood)+'"><div class="hacell"><span class="hd14">14</span>'+inner+'</div><span class="hacap">'+cap+'</span></div>';
 }
-function cur(){return {top:v("top"),bottom:v("bottom"),homeaway:v("homeaway"),layout:v("layout"),mood:v("mood"),sticker:v("sticker"),pack:v("pack"),material:v("material")}}
+function cur(){return {top:v("top"),bottom:v("bottom"),opp:v("opp"),homeaway:v("homeaway"),layout:v("layout"),mood:v("mood"),sticker:v("sticker"),pack:v("pack"),material:v("material")}}
 function mockFor(key,opt){
   var o=cur(); o[key]=opt;
+  if(key==="opp") return {html:oppMock(o),size:1.2};
   if(key==="homeaway") return {html:haMock(o),size:1.3};
   if(key==="top"||key==="bottom") return {html:sideMock(o,key),size:1.02};
   if(key==="mood") return {html:calMock(o),size:.74};
@@ -605,7 +630,7 @@ function cellFigure(){
   '<text x="1" y="3.2" font-size="2.8" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="'+navy+'">14</text>'+
   '<text x="13.2" y="3.4" font-size="1.7" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="#fff"><tspan></tspan></text>'+
   '<rect x="12" y="1.2" width="7" height="4" rx=".8" fill="'+navy+'"/><text x="15.5" y="3.9" text-anchor="middle" font-size="2" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="#fff">HOME</text>'+
-  '<image href="stk/landers.png" x="1.8" y="5.2" width="9" height="9"/>'+
+  '<circle cx="6.3" cy="9.7" r="4.5" fill="#fff" stroke="#e86a1a" stroke-width="1.4"/><text x="6.3" y="10.6" text-anchor="middle" font-size="2.3" fill="#333" font-family="Gaegu,sans-serif" font-weight="700">인천</text>'+
   '<circle cx="15.3" cy="9.7" r="3" fill="#d6263b" stroke="#fff" stroke-width=".35"/><text x="15.3" y="10.6" text-anchor="middle" font-size="2.4" font-weight="700" fill="#fff" font-family="Noto Sans KR,sans-serif">승</text>'+
   '<rect x="2.25" y="14.6" width="16" height="4.5" rx="2.25" fill="'+red+'"/><text x="10.25" y="17.6" text-anchor="middle" font-size="2.3" font-weight="700" fill="#fff" font-family="Noto Sans KR,sans-serif">★ 개막전</text>'+
   '<g stroke="#8a8f99" stroke-width=".12" fill="#8a8f99" font-size="1.6" font-family="Barlow Condensed,sans-serif">'+
@@ -664,7 +689,7 @@ function build(){
         '<h2>날짜 한 칸 약 20 × 19mm, 스티커는 이 크기로</h2><div class="sizegrid"><div style="display:flex;flex-direction:column;gap:1.2cqi;min-width:0">'+
         '<div class="assume"><span class="fact">달력 판형 <b>220 × 150mm 가정</b></span><span class="fact">왼쪽 패널 <b>55mm</b></span><span class="fact">날짜 영역 <b>144 × 118mm</b></span><span class="fact">한 칸 <b>약 20.5 × 19.5mm (6주 달)</b></span><span class="fact">5주 달은 <b>약 20.5 × 23.5mm</b></span></div>'+
         '<table class="stab"><thead><tr><th>스티커</th><th>권장 크기</th><th>시즌 수량 참고</th></tr></thead><tbody>'+
-        '<tr><td>상대팀 로고 <small>(기본)</small></td><td><b>지름 9mm</b></td><td>9개 구단 × 16경기, 구단별 18장</td></tr>'+
+        '<tr><td>상대팀 <small>(기본)</small></td><td><b>지름 10mm</b> (쓰는 칸 6mm)</td><td>9개 구단 × 16경기, 구단별 18장</td></tr>'+
         '<tr><td>경기 결과 <small>(기본)</small></td><td>원형 <b>지름 6mm</b> · 손글씨 <b>8 × 6mm</b> · 야구공 <b>지름 7mm</b></td><td>144경기: 승 · 패 각 80, 무 10, 취소 15</td></tr>'+
         '<tr><td>홈 · 원정 <small>(옵션 2)</small></td><td>태그 <b>7 × 4mm</b> · 옵션 1은 인쇄 글자 높이 2mm</td><td>홈 · 원정 각 75</td></tr>'+
         '<tr><td>이벤트</td><td><b>16 × 4.5mm</b> 라벨</td><td>종류별 3~10장</td></tr>'+
