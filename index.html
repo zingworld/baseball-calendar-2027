@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>야구 달력 결정 보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&family=Barlow+Condensed:wght@500;600;700&family=Gaegu:wght@700&display=swap">
+<style>
+/* Layout: 16:9 decision slides, three option cards per decision, each card renders a live mockup; stacked on phones */
+:root{
+  --ground:#e9ebef; --paper:#f7f6f2; --card:#ffffff; --ink:#1c2740; --muted:#5d6577; --line:#d9dbe1;
+  --accent:#c8102e; --ok:#2f6b4f; --sel:#1c2740;
+  --display:"Black Han Sans","Noto Sans KR",system-ui,sans-serif;
+  --body:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  --num:"Barlow Condensed","Noto Sans KR",system-ui,sans-serif;
+  --hand:"Gaegu","Noto Sans KR",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#121726; --paper:#1b2131; --card:#232b3e; --ink:#eef0f5; --muted:#a8afc0; --line:#374159;
+  --accent:#ff5a6e; --ok:#5fb38a; --sel:#eef0f5; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#121726; --paper:#1b2131; --card:#232b3e; --ink:#eef0f5; --muted:#a8afc0; --line:#374159;
+  --accent:#ff5a6e; --ok:#5fb38a; --sel:#eef0f5; color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);margin:0;padding-inline:16px;box-sizing:border-box}
+*{box-sizing:border-box}
+.deck{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding-block:18px}
+.stage{width:min(100%,calc((100vh - 100px)*16/9));max-width:1320px}
+.slide{position:relative;aspect-ratio:16/9;background:var(--paper);border-radius:6px;box-shadow:0 1px 0 var(--line),0 18px 40px -24px rgba(10,20,40,.45);container-type:inline-size;overflow:hidden;display:none}
+.slide.on{display:block}
+.slide::before{content:"";position:absolute;inset:0 0 auto 0;height:2.6cqi;background:radial-gradient(circle at 50% 70%,var(--ground) 0 .4cqi,transparent .45cqi) 0 0/2cqi 100% repeat-x;border-bottom:1px solid var(--line)}
+.in{position:absolute;inset:4.2cqi 3.6cqi 3cqi 3.6cqi;display:flex;flex-direction:column;gap:1.4cqi;min-width:0}
+.top{display:flex;align-items:baseline;gap:1.6cqi;flex-wrap:wrap}
+.eyebrow{font-family:var(--num);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-size:1.25cqi}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:5cqi} h2{font-size:2.9cqi}
+.hint{font-size:1.3cqi;color:var(--muted)}
+p{margin:0;line-height:1.55}
+.pg{position:absolute;right:3.6cqi;bottom:1.2cqi;font-family:var(--num);font-size:1.15cqi;color:var(--muted);letter-spacing:.08em}
+
+/* option cards */
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6cqi;flex:1;min-height:0}
+.opt{all:unset;overflow:hidden;min-height:0;box-sizing:border-box;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1.3cqi;display:flex;flex-direction:column;gap:.8cqi;min-width:0;position:relative;transition:border-color .15s,box-shadow .15s}
+.opt:hover{border-color:var(--muted)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt.sel{border-color:var(--sel);box-shadow:inset 0 0 0 2px var(--sel)}
+.opt .no{font-family:var(--num);font-weight:700;font-size:1.25cqi;letter-spacing:.1em;color:var(--muted)}
+.opt.sel .no{color:var(--accent)}
+.opt .badge{position:absolute;top:1.1cqi;right:1.1cqi;font-size:1.05cqi;font-weight:700;padding:.25cqi .8cqi;border-radius:99px;background:var(--sel);color:var(--card);display:none}
+.opt.sel .badge{display:block}
+.opt h3{margin:0;font-size:1.85cqi;font-weight:700}
+.opt .desc{font-size:1.3cqi;color:var(--muted);line-height:1.45}
+.opt .stage-mock{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:var(--ground);border-radius:4px;overflow:hidden;padding:.8cqi}
+.facts{display:flex;flex-wrap:wrap;gap:.5cqi}
+.fact{font-size:1.15cqi;padding:.2cqi .7cqi;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.fact b{color:var(--ink);font-weight:700}
+
+/* cover + summary */
+.covergrid{display:grid;grid-template-columns:1.05fr 1fr;gap:3cqi;flex:1;min-height:0;align-items:center}
+.list{display:flex;flex-direction:column;gap:.7cqi}
+.row{all:unset;cursor:pointer;display:grid;grid-template-columns:2.6cqi 11cqi 1fr;gap:1cqi;align-items:center;padding:.8cqi 1cqi;border-radius:4px;background:var(--card);border:1px solid var(--line);font-size:1.35cqi}
+.row:focus-visible{outline:2px solid var(--accent)}
+.row .n{font-family:var(--num);font-weight:700;color:var(--muted)}
+.row .k{font-weight:700}
+.row .v{color:var(--muted)} .row .v.done{color:var(--ink)}
+.row .v.done::before{content:"";display:inline-block;width:.8cqi;height:.8cqi;border-radius:50%;background:var(--ok);margin-right:.7cqi;vertical-align:middle}
+.status{font-size:1.15cqi;color:var(--muted)}
+.preview{display:flex;gap:1.6cqi;align-items:center;justify-content:center;background:var(--ground);border-radius:6px;padding:1.6cqi;min-height:0;height:100%}
+.note{width:100%;font:inherit;font-size:1.3cqi;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:4px;padding:.8cqi 1cqi;resize:none;height:6cqi}
+.note:focus-visible{outline:2px solid var(--accent)}
+
+/* ===== mockups (sized in em, wrapper sets font-size) ===== */
+.mk{font-size:var(--mk,1cqi);display:flex;flex-direction:column;align-items:center;font-family:var(--body)}
+.mk *{box-sizing:border-box}
+.cal{position:relative;background:var(--p-paper);color:var(--p-ink);border-radius:.5em;box-shadow:0 .4em 1em -.5em rgba(0,0,0,.45);display:flex;flex-direction:column;padding:1.6em 1.1em .9em;overflow:hidden}
+.cal::before{content:"";position:absolute;left:.8em;right:.8em;top:.35em;height:.9em;background:radial-gradient(circle,var(--p-ring) 0 .22em,transparent .26em) 0 50%/1.05em 100% repeat-x}
+.cal.wide{width:34em;height:20em;flex-direction:row;gap:1em;padding:1.7em 1.1em .9em}
+.stand{width:35em;height:2.2em;background:var(--p-stand);clip-path:polygon(4% 0,96% 0,100% 100%,0 100%);border-radius:0 0 .3em .3em;margin-top:-.2em}
+.cal.sideonly{width:16em;height:20em;flex-direction:row;padding:1.7em 0 .9em 1.1em}
+.peek{flex:1;border-left:1px solid var(--p-line);margin-left:.8em;background:repeating-linear-gradient(var(--p-paper) 0 1.6em,var(--p-line) 1.6em calc(1.6em + 1px))}
+.side{width:9.6em;flex:none;display:flex;flex-direction:column;gap:.45em;min-height:0}
+.mon{display:flex;flex-direction:column;align-items:center;line-height:1}
+.mon .m{font-family:var(--num);font-weight:700;font-size:3.2em;color:var(--p-main)}
+.mon .t{font-family:var(--num);font-weight:600;font-size:.8em;letter-spacing:.08em;margin-top:.15em}
+.slot{border-radius:.3em;position:relative;min-height:0;transition:box-shadow .2s}
+.slot.top{flex:1.25;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2em}
+.slot.bot{flex:1;display:flex;flex-direction:column;gap:.25em;padding:.3em .35em;border:1px solid var(--p-line)}
+.focus-top .slot.top,.focus-bottom .slot.bot{box-shadow:0 0 0 .18em var(--p-accent2)}
+.art{width:100%;max-height:5.2em}
+.art.pl{width:auto;height:5em}
+.slot .cap{font-family:var(--hand);font-size:.75em;color:var(--p-muted)}
+.s2{flex-direction:row!important;gap:.4em!important;padding:0 .2em}
+.s2 .art.pl{height:4.6em;flex:none}
+.bio{display:flex;flex-direction:column;gap:.28em;flex:1;min-width:0}
+.bio b{font-size:.62em;color:var(--p-main)}
+.bio i,.lines i,.kv i,.slot .ln{display:block;height:.18em;background:var(--p-line);border-radius:1em}
+.mini .mt{font-family:var(--num);font-weight:700;font-size:.62em;letter-spacing:.08em;color:var(--p-main)}
+.mg{display:grid;grid-template-columns:repeat(7,1fr);gap:.05em .1em;font-family:var(--num);font-size:.5em;text-align:center;line-height:1.25}
+.mg .sun{color:var(--p-sun)}
+.slot .lab{font-family:var(--hand);font-size:.75em;color:var(--p-main)}
+.mvp{display:flex;gap:.4em;align-items:center;flex:1}
+.mvp .frame{width:2.4em;height:2.8em;border:1px dashed var(--p-muted);border-radius:.25em;display:grid;place-items:center;color:var(--p-accent2);font-size:.9em;flex:none}
+.lines{flex:1;display:flex;flex-direction:column;gap:.6em}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:.25em .35em;align-items:end;font-size:.55em;color:var(--p-muted)}
+.kv i{align-self:center}
+.b3 .ln{margin-top:.5em}
+.hd{display:flex;align-items:baseline;gap:.5em;margin-bottom:.4em}
+.hd .m{font-family:var(--num);font-weight:700;font-size:2.6em;line-height:.9;color:var(--p-main)}
+.hd .t{font-family:var(--num);font-weight:600;font-size:.95em;letter-spacing:.08em}
+.hd .tag{margin-left:auto;font-family:var(--hand);font-size:1.05em;color:var(--p-main)}
+.body{display:flex;gap:.6em;flex:1;min-height:0}
+.grid{flex:1;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:auto repeat(5,1fr);border-top:.12em solid var(--p-main);min-width:0}
+.dw{font-family:var(--num);font-size:.7em;font-weight:600;text-align:left;padding:.15em .25em;letter-spacing:.05em}
+.dw.sun{color:var(--p-sun)}
+.dc{border-right:1px solid var(--p-line);border-bottom:1px solid var(--p-line);position:relative;padding:.12em .2em;min-height:0;overflow:hidden}
+.dc:nth-child(7n+1){border-left:1px solid var(--p-line)}
+.dc .d{font-family:var(--num);font-size:.68em;font-weight:600;line-height:1}
+.dc.sun .d{color:var(--p-sun)}
+.dc .stk{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:.12em}
+.memo{width:28%;display:flex;flex-direction:column;gap:.15em;border-top:.12em solid var(--p-main);padding-top:.25em;min-width:0}
+.memo .lab{font-family:var(--hand);font-size:.9em;color:var(--p-main)}
+.memo .ln{flex:1;border-bottom:1px dashed var(--p-line)}
+.free{width:36%;border:.12em dashed var(--p-line);border-radius:.4em;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--hand);font-size:.9em;color:var(--p-muted);padding:.4em;min-width:0}
+.l3 .dc .d{font-size:.6em}
+
+/* stickers */
+.em{display:block;width:1.6em;height:1.6em;aspect-ratio:1;border-radius:50%;object-fit:cover;background:#fff;border:.1em solid #fff;box-shadow:0 .08em .2em rgba(0,0,0,.3);flex:none;max-width:none}
+.res{width:.9em;height:.9em;border-radius:50%;color:#fff;font-family:var(--num);font-weight:700;font-size:.62em;display:grid;place-items:center;line-height:1;flex:none;width:1.35em;height:1.35em}
+.res{aspect-ratio:1}
+.res.w{background:#d6263b}.res.l{background:#3866c7}.res.d{background:#8a8f99}
+.dot{width:.45em;height:.45em;border-radius:50%;flex:none}
+.lbl{font-family:var(--hand);font-size:.72em;line-height:1;padding:.18em .45em;border-radius:.15em;color:#fff;transform:rotate(-4deg);white-space:nowrap;flex:none;box-shadow:0 .05em .1em rgba(0,0,0,.2)}
+.lbl::before{content:"";display:inline-block;width:.45em;height:.45em;border-radius:50%;background:rgba(255,255,255,.85);margin-right:.25em;vertical-align:middle}
+.ball{width:1.6em;height:1.6em;flex:none}
+.ev{font-family:var(--hand);font-size:.62em;line-height:1.1;padding:.15em .35em;border-radius:.3em;border:.1em solid currentColor;white-space:nowrap;flex:none}
+
+.hacell{width:15em;height:10.5em;background:var(--p-paper);border:.12em solid var(--p-main);border-radius:.3em;position:relative;color:var(--p-ink)}
+.hd14{position:absolute;left:.5em;top:.3em;font-family:var(--num);font-weight:700;font-size:1.8em}
+.words{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;gap:1.1em;font-family:var(--num);font-weight:600;font-size:1.3em;letter-spacing:.06em;color:var(--p-muted)}
+.words>span{position:relative}
+.pair{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;gap:.6em}
+.pair .drop{position:relative;left:auto;top:auto}
+.drop{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:2.1em;display:block;line-height:0}
+.words .drop{font-size:1.75em}
+.hatag{display:inline-block;color:#fff;font-family:var(--num);font-weight:700;font-size:.55em;letter-spacing:.06em;line-height:1;padding:.35em .55em;border-radius:.35em;box-shadow:0 .06em .15em rgba(0,0,0,.25)}
+.drop .hatag{font-size:.36em}
+.hacap{margin-top:.6em;font-size:.72em;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){
+  .words .drop{animation:dropA 3.4s ease-out infinite}
+  .pair .drop{animation:dropB 3.4s ease-out infinite}
+  .pair .drop.d2{animation-delay:.35s}
+}
+@keyframes dropA{0%,8%{opacity:0;transform:translate(-50%,-260%) rotate(-25deg) scale(1.3)}24%{opacity:1;transform:translate(-50%,-50%) rotate(5deg) scale(1)}30%,86%{opacity:1;transform:translate(-50%,-50%) rotate(0)}100%{opacity:0;transform:translate(-50%,-50%)}}
+@keyframes dropB{0%,8%{opacity:0;transform:translateY(-220%) rotate(-25deg) scale(1.3)}24%{opacity:1;transform:translateY(0) rotate(5deg) scale(1)}30%,86%{opacity:1;transform:none}100%{opacity:0;transform:none}}
+.rbrow{display:grid;grid-template-columns:repeat(2,auto);gap:1.1em 1.6em;justify-content:center;align-items:center}
+.rbcell{display:flex;flex-direction:column;align-items:center;gap:.35em;font-size:.7em;color:var(--muted)}
+.rbcell .rb,.rbcell .face{font-size:1.43em}
+.rb{display:inline-grid;place-items:center;flex:none;line-height:1;white-space:nowrap}
+.rb1{width:3em;height:3em;aspect-ratio:1;border-radius:50%;color:#fff;font-family:var(--body);font-weight:700;font-size:1em;border:.18em solid #fff;box-shadow:0 .1em .3em rgba(0,0,0,.28)}
+.rb1:not(:empty){letter-spacing:-.02em}
+.rb2{min-width:3.4em;height:2.6em;padding:0 .5em;border:.14em solid;border-radius:.35em;background:#fff;font-family:var(--hand);font-weight:700;font-size:1.05em;box-shadow:0 .1em .25em rgba(0,0,0,.18)}
+.face{width:3.4em;height:3.4em;flex:none;filter:drop-shadow(0 .1em .15em rgba(0,0,0,.22))}
+.mini-b{font-size:.42em;display:inline-flex}
+.stage-mock{position:relative}
+.corner{position:absolute;left:.7cqi;bottom:.7cqi;display:flex;flex-direction:column;gap:.3em;align-items:flex-start}
+.ccell{width:7.5em;height:5.2em;background:#f7f5ef;border:1px solid #d6d3c8;border-radius:.25em;position:relative;box-shadow:0 .15em .4em -.15em rgba(0,0,0,.35)}
+.ccell .d,.evcell .d{position:absolute;left:.4em;top:.25em;font-family:var(--num);font-weight:700;font-size:1em;color:#1c2740}
+.ccell .cc{position:absolute;inset:.9em 0 0 0;display:flex;align-items:center;justify-content:center;gap:.3em}
+.ccap{font-size:.85em;color:var(--muted)}
+.fixed{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1cqi 1.2cqi;display:flex;flex-direction:column;gap:.7cqi}
+.fixed .tag{font-family:var(--num);font-weight:700;font-size:1.2cqi;letter-spacing:.1em;color:var(--accent)}
+.fixed .fact{font-size:1.2cqi}
+.listgrid{display:grid;grid-template-columns:1.35fr 1fr;gap:2cqi;flex:1;min-height:0}
+.sheetbox{background:var(--ground);border-radius:6px;display:grid;place-items:center;padding:1.6cqi;min-width:0}
+.sheetcard{background:#fbfaf6;color:#1c2740;border-radius:.6cqi;padding:1.6cqi;box-shadow:0 .5cqi 1.4cqi -.6cqi rgba(0,0,0,.45);display:flex;flex-direction:column;gap:1.4cqi;width:100%}
+.sheetcard .sh{display:flex;justify-content:space-between;font-family:var(--num);font-weight:700;font-size:1.25cqi;letter-spacing:.08em}
+.evrow{display:flex;flex-wrap:wrap;gap:1cqi}
+.evs{display:inline-flex;align-items:center;gap:.4em;font-weight:700;font-size:1.7cqi;color:#fff;background:var(--c);padding:.55em 1em;border-radius:99px;border:.2em solid #fff;box-shadow:0 .15em .4em rgba(0,0,0,.25);white-space:nowrap}
+.evs::before{content:"★";font-size:.75em;opacity:.85}
+.evs.sm{font-size:.95cqi}
+.evcell{position:relative;width:12cqi;height:8cqi;background:#f7f5ef;border:1px solid #d6d3c8;border-radius:.3cqi;display:grid;place-items:center;align-self:flex-start;font-size:1.3cqi}
+.evcell .d2{position:absolute;left:0;bottom:-2cqi;font-size:1cqi;color:#5d6577;white-space:nowrap}
+.fanrow{display:grid;grid-template-columns:1fr 1fr;gap:1cqi 1.4cqi}
+.fan{display:flex;align-items:stretch;border:.18cqi solid var(--c);border-radius:.5cqi;overflow:hidden;background:#fff;box-shadow:0 .15cqi .4cqi rgba(0,0,0,.18);font-size:1.45cqi;min-width:0}
+.fan b{background:var(--c);color:#fff;padding:.5em .8em;white-space:nowrap;font-weight:700}
+.fan i{flex:1;margin:.45em .7em;border-bottom:.12cqi dashed #b9bcc4;font-style:normal;font-family:var(--hand);color:#5d6577;font-size:1.05em;line-height:1.4;min-width:0}
+.ideas{display:flex;flex-direction:column;gap:1cqi;min-width:0;min-height:0}
+.ilab{font-weight:700;font-size:1.5cqi}
+.add{display:flex;gap:.8cqi}
+.add input{flex:1;min-width:0;font:inherit;font-size:1.35cqi;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:4px;padding:.7cqi 1cqi}
+.add button{font:inherit;font-size:1.35cqi;font-weight:700;color:var(--card);background:var(--sel);border:0;border-radius:4px;padding:0 1.6cqi;cursor:pointer}
+.add input:focus-visible,.add button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ichips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.7cqi;overflow:auto;min-height:0;align-content:flex-start;flex:1}
+.ichips li{display:inline-flex;align-items:center;gap:.6em;font-size:1.3cqi;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:.35em .5em .35em 1em}
+.ichips li.empty{border-style:dashed;color:var(--muted);padding:.5em 1em}
+.ichips button{font:inherit;line-height:1;width:1.6em;height:1.6em;border-radius:50%;border:0;background:var(--ground);color:var(--muted);cursor:pointer}
+@media (max-width:760px){
+  .listgrid{grid-template-columns:1fr}
+  .fixed .tag,.fixed .fact{font-size:12px}
+  .sheetcard{padding:14px;gap:12px} .sheetcard .sh{font-size:12px}
+  .evs{font-size:15px} .evs.sm{font-size:10px} .evcell{width:110px;height:72px} .evcell .d2{font-size:11px;bottom:-18px}
+  .fanrow{grid-template-columns:1fr} .fan{font-size:14px}
+  .ilab{font-size:15px} .add input,.add button{font-size:15px;padding:8px 10px} .ichips li{font-size:14px}
+}
+.pack2{display:flex;align-items:center;gap:.6em;flex-wrap:nowrap}
+.pgroup{display:flex;gap:.5em;align-items:flex-end;padding:.5em;border-radius:.4em}
+.pgroup.opt{border:.1em dashed var(--muted)}
+.pitem{display:flex;flex-direction:column;align-items:center;gap:.3em;font-size:.62em;color:var(--muted);text-align:center;width:6.2em}
+.pitem b{font-weight:700;color:var(--ink);line-height:1.25}
+.pitem em{font-style:normal;color:var(--accent);font-weight:700}
+.pcal{width:6em;height:4.6em;background:#f7f5ef;border:.18em solid #1c2a4a;border-radius:.3em;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;color:#1c2a4a;box-shadow:0 .3em .7em -.4em rgba(0,0,0,.5)}
+.pcal .m{font-family:var(--num);font-weight:700;font-size:2em}
+.pcal .t{font-family:var(--num);font-size:.7em;letter-spacing:.06em}
+.psheet{width:4.6em;height:6em;background:#fbfaf6;border:1px solid #d6d3c8;border-top:1.1em solid var(--c);border-radius:.3em;display:grid;place-items:center;padding:.3em;color:#1c2740;font-weight:700;line-height:1.2;box-shadow:0 .3em .7em -.4em rgba(0,0,0,.5);background-image:radial-gradient(circle,#d6d3c8 0 .35em,transparent .4em);background-size:1.3em 1.3em;background-position:.3em .3em}
+.psheet span{background:#fbfaf6;padding:0 .2em}
+.addon .psheet{opacity:.85}
+.pgift{width:6em;height:6em;border-radius:.3em;background:#c8102e;position:relative;display:grid;place-items:center;box-shadow:0 .3em .7em -.4em rgba(0,0,0,.5)}
+.pgift::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:.5em;background:#f2c94c;transform:translateX(-50%)}
+.pgift .bow{position:absolute;top:-.7em;left:50%;width:2em;height:1.2em;transform:translateX(-50%);border:.35em solid #f2c94c;border-radius:50% 50% 0 0}
+.pgift .msg{position:relative;background:#fffdf7;color:#1c2740;font-family:var(--hand);font-size:.95em;line-height:1.15;padding:.35em .45em;border-radius:.2em;transform:rotate(-4deg);box-shadow:0 .1em .3em rgba(0,0,0,.25)}
+.pplus{font-family:var(--num);font-weight:700;font-size:1.3em;color:var(--muted)}
+.reset{color:var(--muted)!important}
+.reset.arm{color:#fff!important;background:var(--accent)!important;border-color:var(--accent)!important}
+.oform{width:23em;background:#fff;color:#1c2740;border-radius:.5em;box-shadow:0 .4em 1em -.5em rgba(0,0,0,.4);padding:.8em;display:flex;flex-direction:column;gap:.45em;font-family:var(--body)}
+.ohead{display:flex;justify-content:space-between;align-items:baseline;font-size:.7em;color:#5d6577;border-bottom:1px solid #e3e5ea;padding-bottom:.5em}
+.ohead b{color:#c8102e;font-size:1.1em}
+.orow{display:grid;grid-template-columns:2.6em 1fr auto;align-items:center;gap:.6em;padding:.45em .6em;border:1px solid #e3e5ea;border-radius:.4em}
+.orow.fixed{background:#f3f4f7}
+.orow.on{border-color:#1c2a4a;box-shadow:inset 0 0 0 .08em #1c2a4a}
+.ck{width:1.3em;height:1.3em;border:.12em solid #9aa0ab;border-radius:.25em;display:grid;place-items:center;font-size:.9em;font-weight:700;justify-self:center}
+.ck.on{background:#1c2a4a;border-color:#1c2a4a;color:#fff}
+.ck.fixed{width:auto;height:auto;border:0;font-size:.6em;color:#fff;background:#5d6577;padding:.25em .5em;border-radius:99px}
+.on-name{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.on-name b{font-size:.85em}
+.on-name small{font-size:.62em;color:#5d6577;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr{font-size:.65em;font-weight:700;color:#1c2a4a;white-space:nowrap}
+.osub{font-size:.62em;font-weight:700;color:#c8102e;margin-top:.2em}
+.omsg{display:flex;flex-direction:column;gap:.2em;border:1px dashed #9aa0ab;border-radius:.4em;padding:.4em .6em}
+.omsg span{font-size:.6em;color:#5d6577}
+.omsg i{font-style:normal;font-family:var(--hand);font-size:.9em}
+.sheet.wide{width:34em;display:grid;grid-template-columns:1fr 1fr;column-gap:1.2em}
+.sheet.wide .sh{grid-column:1/-1}
+.basegrid{display:grid;grid-template-columns:1fr 1.45fr;gap:2.4cqi;flex:1;min-height:0;align-items:center}
+.basefacts{display:flex;flex-direction:column;gap:1.2cqi}
+.bf{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1.4cqi 1.6cqi;display:flex;flex-direction:column;gap:.4cqi}
+.bf span{font-family:var(--num);font-weight:700;font-size:1.2cqi;letter-spacing:.1em;color:var(--accent)}
+.bf b{font-size:2cqi}
+.bf p{font-size:1.25cqi;color:var(--muted)}
+.ovgrid{display:grid;grid-template-columns:1fr 1fr;gap:1cqi 1.6cqi;align-content:start}
+.ovgrid .row{font-size:1.5cqi;padding:1.2cqi 1.2cqi;grid-template-columns:2.6cqi 13cqi 1fr}
+.sumgrid{display:grid;grid-template-columns:1fr 1.5fr;gap:2cqi;flex:1;min-height:0}
+.sumgrid .list{gap:.5cqi;min-height:0}
+.sumgrid .row{font-size:1.15cqi;padding:.55cqi .9cqi;grid-template-columns:2cqi 9.5cqi 1fr}
+.sumgrid .note{height:4.6cqi}
+.preview.col{flex-direction:column;gap:1.4cqi}
+.sizegrid{display:grid;grid-template-columns:1.25fr 1fr;gap:2.4cqi;flex:1;min-height:0}
+.stab{width:100%;border-collapse:collapse;font-size:1.25cqi}
+.stab th,.stab td{text-align:left;padding:.55cqi .7cqi;border-bottom:1px solid var(--line);vertical-align:top}
+.stab th{font-size:1.1cqi;color:var(--muted);font-weight:500}
+.stab td b{font-family:var(--num);font-size:1.15em}
+.assume{display:flex;flex-wrap:wrap;gap:.6cqi}
+.cellfig{background:var(--ground);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1cqi;padding:1.4cqi;min-height:0}
+.cellfig svg{width:100%;max-height:34cqi}
+.cellfig p{font-size:1.15cqi;color:var(--muted);text-align:center}
+@media (max-width:760px){
+  .basegrid,.ovgrid,.sumgrid,.sizegrid{grid-template-columns:1fr}
+  .bf span{font-size:12px} .bf b{font-size:17px} .bf p{font-size:13px}
+  .ovgrid .row,.sumgrid .row{font-size:13px;padding:8px 10px;grid-template-columns:22px 100px 1fr}
+  .stab{font-size:13px} .stab th{font-size:12px} .cellfig p{font-size:12px} .sumgrid .note{height:64px}
+}
+.lead2{font-size:1.45cqi;color:var(--muted);max-width:70ch}
+@media (max-width:760px){.lead2{font-size:14px}}
+.haw{position:absolute;left:0;right:0;top:60%;transform:translateY(-50%);display:flex;justify-content:space-around;font-family:var(--num);font-weight:600;font-size:.4em;letter-spacing:.04em;color:var(--p-muted)}
+.haw i{font-style:normal}
+.dc .stk.on-aw{left:73%}
+.dc .stk.on-hm{left:27%}
+.rbc{position:absolute;right:.15em;top:.12em;display:flex;line-height:0}
+.rbc .mini-b{font-size:.36em}
+.xtra{position:absolute;left:0;right:0;bottom:.12em;display:flex;justify-content:center;line-height:1}
+.xev{font-size:.36em;font-weight:700;color:#fff;padding:.25em .55em;border-radius:99px;white-space:nowrap}
+.xfan{display:inline-flex;font-size:.36em;border:.12em solid var(--c);border-radius:.3em;overflow:hidden;background:#fff;white-space:nowrap}
+.xfan b{background:var(--c);color:#fff;padding:.15em .35em}
+.xfan i{font-style:normal;font-family:var(--hand);color:#333;padding:.1em .35em}
+.dc .stk{top:52%}
+.jump{position:absolute;top:2.85cqi;right:3.6cqi;z-index:2;font:inherit;font-size:1.1cqi;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:.35cqi 1.1cqi;cursor:pointer}
+.jump:hover{border-color:var(--ink)}
+.jump:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.in{top:5cqi!important}
+@media (max-width:760px){.jump{position:static;display:block;margin:20px 14px -8px auto;font-size:12px;padding:4px 12px}}
+/* sticker sheet */
+.sheet{background:var(--p-sheet);border-radius:.6em;padding:.9em;box-shadow:0 .4em 1em -.5em rgba(0,0,0,.45);display:flex;flex-direction:column;gap:.55em;width:19em;color:var(--p-ink)}
+.sheet .sh{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--num);font-weight:700;font-size:.85em;letter-spacing:.08em}
+.sec{display:flex;flex-direction:column;gap:.3em}
+.sec .st{font-size:.62em;font-weight:700;color:var(--p-muted)}
+.sec .items{display:flex;flex-wrap:wrap;gap:.35em;align-items:center}
+.sheets{display:flex;gap:.25em;align-items:flex-end}
+.sheets i{width:1.1em;height:1.5em;border-radius:.15em;background:var(--p-sheet);border:1px solid var(--p-line)}
+.pack{display:flex;gap:1em;align-items:flex-end;flex-wrap:wrap;justify-content:center}
+.thing{display:flex;flex-direction:column;align-items:center;gap:.3em;font-size:.7em;color:var(--muted);text-align:center}
+.box3d{border-radius:.3em;box-shadow:0 .3em .8em -.4em rgba(0,0,0,.5)}
+.tape{width:3.4em;height:3.4em;border-radius:50%;background:radial-gradient(circle,var(--ground) 0 .9em,var(--p-main) .95em 1.25em,var(--p-accent2) 1.3em)}
+.swatch{width:9em;height:6em;border-radius:.4em;position:relative;box-shadow:0 .3em .8em -.4em rgba(0,0,0,.45)}
+
+/* controls */
+.ctrl{display:flex;align-items:center;gap:12px;font-family:var(--num);color:var(--muted);font-size:15px;flex-wrap:wrap;justify-content:center}
+.ctrl button{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:4px;padding:6px 14px;cursor:pointer}
+.ctrl button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dots{display:flex;gap:6px}
+.dots button{width:10px;height:10px;padding:0;border-radius:50%;background:var(--line);border:0}
+.dots button.on{background:var(--accent)}
+.dots button.done{box-shadow:inset 0 0 0 2px var(--ok)}
+
+@media (max-width:760px){
+  .deck{display:block;padding-block:16px}
+  .stage{width:100%}
+  .slide{display:block;aspect-ratio:auto;margin-bottom:16px;container-type:normal}
+  .slide::before{height:14px;background-size:12px 100%}
+  .in{position:static;padding:28px 14px 30px;gap:12px}
+  .eyebrow{font-size:12px} h1{font-size:28px} h2{font-size:20px} .hint{font-size:13px}
+  .opts,.covergrid{grid-template-columns:1fr;gap:12px}
+  .opt{padding:12px;gap:8px} .opt .no{font-size:12px} .opt h3{font-size:16px} .opt .desc{font-size:13px}
+  .opt .badge{font-size:11px;padding:2px 8px;top:10px;right:10px}
+  .opt .stage-mock{min-height:190px;padding:10px}
+  .fact{font-size:11px;padding:2px 7px}
+  .row{grid-template-columns:22px 92px 1fr;font-size:13px;gap:8px;padding:8px 10px}
+  .row .v.done::before{width:7px;height:7px;margin-right:6px}
+  .status,.note{font-size:13px} .note{height:64px;padding:8px}
+  .preview{flex-direction:column;padding:12px}
+  .pg{position:static;display:block;padding:0 14px 12px;font-size:12px}
+  .mk{font-size:var(--mk-m,8px)!important}
+}
+</style>
+</head>
+<body>
+
+<div class="deck">
+<div class="stage" id="stage"></div>
+<nav class="ctrl" aria-label="슬라이드 이동">
+  <button type="button" id="prev">← 이전</button>
+  <div class="dots" id="dots"></div>
+  <button type="button" id="next">다음 →</button>
+  <button type="button" id="reset" class="reset">선택 초기화</button>
+  <span id="save" aria-live="polite"></span>
+</nav>
+</div>
+
+<script>
+(function(){
+/* ---------- data ---------- */
+var MOODS={
+  1:{name:"클래식 볼파크",paper:"#f7f5ef",ink:"#1c2740",main:"#1c2a4a",accent2:"#c8102e",sun:"#c8102e",line:"#d6d3c8",ring:"#3a3f4a",stand:"#1c2a4a",sky:"#cfdcec",field:"#3f7d4f",dirt:"#c9875a",sheet:"#fbfaf6",muted:"#7a7f8c"},
+  2:{name:"레트로 스코어보드",paper:"#eef1e6",ink:"#1d2b22",main:"#1f4d3a",accent2:"#f2b630",sun:"#d2552b",line:"#c9d1bf",ring:"#2b2b2b",stand:"#1f4d3a",sky:"#f3dfa2",field:"#2e6a4c",dirt:"#b9743f",sheet:"#f6f7ef",muted:"#6f7a6c"},
+  3:{name:"파스텔 다꾸",paper:"#fffaf7",ink:"#4a4766",main:"#7b78b8",accent2:"#f4a7b9",sun:"#e5809b",line:"#ece3e6",ring:"#b9b4cf",stand:"#c9c3e6",sky:"#dff0ec",field:"#a6d8c3",dirt:"#f3c6a8",sheet:"#ffffff",muted:"#9a95b0"}
+};
+var LOGO=["twins","wiz","lions","dinos","bears","tigers","giants","landers","heroes","eagles"];
+function logo(i,extra){return '<img class="em" src="stk/'+LOGO[i%LOGO.length]+'.png" alt=""'+(extra||"")+'>'}
+var TEAM=["#c8102e","#0b2a5b","#e85d04","#1d6f42","#6a1b9a","#222222","#0077b6","#b08900","#8d1b3d","#5c6770"];
+
+var D=[
+ {key:"top",q:"왼쪽 위 그림 칸",title:"왼쪽 위 그림 칸에는 무엇을 넣을까?",hint:"가로 탁상형(샘플 모양)은 확정이에요. 왼쪽 패널에 들어갈 내용을 정해요.",opts:[
+   {t:"구단 구장 그림",d:"달마다 다른 구장을 선 그림으로. 열두 달 넘기면 전 구장을 다 돌아요.",f:[["소장 포인트","구장 투어"],["제작","구장 일러스트 10~12장"],["검토","구장 디자인 사용"]]},
+   {t:"전설의 선수 소개",d:"선수 그림 한 컷과 4~5줄 소개. 아이에게 들려줄 야구 이야기가 생겨요.",f:[["읽을거리","있음"],["제작","그림 + 원고 12편"],["검토","초상·성명권"]]},
+   {t:"이달의 야구 룰 한 컷",d:"제안 옵션. 인필드 플라이, 보크 같은 룰을 그림 퀴즈로 보여줘요.",f:[["서브 타겟","잘 맞음"],["제작","그림 + 짧은 글"],["검토","부담 적음"]]}]},
+ {key:"bottom",q:"왼쪽 아래 작은 칸",title:"그림 아래 작은 칸에는 무엇을 넣을까?",hint:"매달 직접 채우는 칸이 있으면 다꾸 매니아가 더 오래 써요.",opts:[
+   {t:"다음 달 미니 달력",d:"다음 달 날짜를 미리 보여줘요. 가장 익숙한 구성이에요.",f:[["실용성","높음"],["꾸밀 거리","적음"]]},
+   {t:"나만의 MVP 선수",d:"이달 가장 잘한 선수를 직접 적고 스티커로 꾸며요.",f:[["다꾸","좋음"],["아이와 함께","좋음"]]},
+   {t:"직관 · 원정 후기 메모",d:"경기장, 날짜, 한 줄 후기를 적는 칸이에요.",f:[["기록","남음"],["다꾸","보통"]]}]},
+ {key:"homeaway",q:"홈 · 원정 표시",title:"오늘 경기가 홈인지 원정인지, 어떻게 표시할까?",hint:"기본: 상대팀 스티커를 날짜 칸에 붙여 오늘 누구와 경기하는지 표시해요.",opts:[
+   {t:"HOME · AWAY 글자 위에 붙이기",d:"칸마다 HOME · AWAY를 인쇄해 두고, 홈 경기면 AWAY 자리에 상대팀 스티커를 붙여요.",f:[["인쇄","칸마다 글자"],["스티커","추가 없음"],["한눈에","잘 보임"]]},
+   {t:"홈 · 원정 스티커 따로",d:"HOME, AWAY 스티커를 따로 만들어 상대팀 스티커 옆에 붙여요.",f:[["인쇄","없음"],["스티커","경기당 2장"],["다꾸","재미있음"]]},
+   {t:"구분하지 않기",d:"상대팀 스티커만 붙여요. 가장 간단하고 칸이 깔끔해요.",f:[["인쇄","없음"],["스티커","경기당 1장"],["정보","홈·원정 없음"]]}]},
+ {key:"sticker",q:"경기 결과 스티커",title:"경기 결과 스티커는 어떤 모양으로?",hint:"승 · 패 · 무 · 취소 4종이에요. 상대팀은 로고 스티커로 따로 붙여요.",opts:[
+   {t:"원형 배지",d:"동그라미 안에 글자 하나. 색으로 바로 구분돼요.",f:[["가독성","높음"],["크기","작게도 잘 보임"]]},
+   {t:"손글씨 네모",d:"네모 칸 안에 손글씨. 다꾸 감성이 살아요.",f:[["다꾸 감성","높음"],["가독성","좋음"]]},
+   {t:"야구공 표정",d:"이기면 웃고, 지면 화내는 공. 표정만 봐도 결과가 보여요.",f:[["아이 반응","좋음"],["캐릭터화","가능"]]}]},
+ {key:"pack",q:"판매 구성",title:"어떻게 묶어서 팔까?",hint:"가격과 마진(목표 20%)에 직접 연결돼요. 원가는 견적 후 확정해요.",opts:[
+   {t:"올인원 한 가지",d:"달력에 지금까지 만든 스티커(상대팀, 경기 결과, 이벤트, 찐팬)를 모두 넣어 한 가지로 팔아요.",f:[["고르기","고민 없음"],["재고","1종"],["가격","하나로 단순"]]},
+   {t:"기본 + 추가 옵션",d:"기본은 달력 + 상대팀·경기 결과 스티커. 이벤트, 찐팬 스티커는 원하는 사람만 추가해요.",f:[["기본가","낮출 수 있음"],["재고","3종"],["객단가","옵션으로 상승"]]},
+   {t:"옵션 2 + 선물용 커버",d:"옵션 2에 선물용 커버를 더하고, 달력 첫 장에 주문자가 쓴 메시지를 넣어 줘요.",f:[["선물 수요","연말 시즌"],["재고","3종 + 커버"],["검토","메시지 인쇄 공정"]]}]},
+ {key:"material",q:"종이·스티커 소재",title:"종이와 스티커는 무엇으로? (옵션 더 탐색 필요)",hint:"인쇄소 샘플로 실물을 비교한 뒤 확정해요.",opts:[
+   {t:"모조지 + 무광 유포지",d:"필기감 좋은 기본 조합. 펜으로 쓰기 편해요.",f:[["필기감","좋음"],["단가","낮음"],["재부착","불가"]]},
+   {t:"고급지 + 리무버블",d:"떼었다 다시 붙일 수 있어 실수해도 괜찮아요.",f:[["다꾸 친화","높음"],["단가","보통"],["재부착","가능"]]},
+   {t:"크라프트 + 투명 PET",d:"빈티지한 갈색 종이에 투명 스티커. 소장용 느낌.",f:[["분위기","빈티지"],["단가","높음"],["필기","유성펜 권장"]]}]}
+];
+
+/* ---------- state ---------- */
+var state={note:""}; D.forEach(function(x){state[x.key]=null});
+var LS="baseball-cal-decisions-v2", db=null, ref=null, writing=Promise.resolve();
+try{var saved=JSON.parse(localStorage.getItem(LS)||"null"); if(saved) Object.assign(state,saved)}catch(e){}
+function v(k){return state[k]||1}
+
+/* ---------- mockup builders ---------- */
+function vars(m){var p=MOODS[m];return "--p-paper:"+p.paper+";--p-ink:"+p.ink+";--p-main:"+p.main+";--p-accent2:"+p.accent2+";--p-sun:"+p.sun+";--p-line:"+p.line+";--p-ring:"+p.ring+";--p-stand:"+p.stand+";--p-sky:"+p.sky+";--p-field:"+p.field+";--p-dirt:"+p.dirt+";--p-sheet:"+p.sheet+";--p-muted:"+p.muted}
+function ballSvg(face,col){
+  var mouth=face==="happy"?'<path d="M11 21 Q16 26 21 21" stroke="#333" stroke-width="1.8" fill="none" stroke-linecap="round"/>':face==="angry"?'<path d="M11 23 Q16 19 21 23" stroke="#333" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M9 11 L14 13 M23 11 L18 13" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>':'<path d="M12 22 H20" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>';
+  var tear=face==="sad"?'<path d="M22 16 q1.5 3 0 4 q-1.5-1 0-4z" fill="#5aa0e6"/>':"";
+  return '<svg class="ball" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#fff" stroke="#c9c9c9" stroke-width="1"/><path d="M6 7 Q11 16 6 25" stroke="'+col+'" stroke-width="1.4" fill="none" stroke-dasharray="2 1.6"/><path d="M26 7 Q21 16 26 25" stroke="'+col+'" stroke-width="1.4" fill="none" stroke-dasharray="2 1.6"/><circle cx="12" cy="15" r="1.4" fill="#333"/><circle cx="20" cy="15" r="1.4" fill="#333"/>'+mouth+tear+'</svg>';
+}
+var RES={w:{t:"승",h:"승!",c:"#d6263b"},l:{t:"패",h:"패..",c:"#2f5fc4"},d:{t:"무",h:"무",c:"#7d8591"},c:{t:"취소",h:"취소",c:"#2f9a8a"}};
+function faceSvg(r){
+  var k="#2b2b2b", st="#d6263b", eyes, mouth, extra="";
+  if(r==="w"){eyes='<path d="M10 15 q2 -3 4 0 M18 15 q2 -3 4 0" stroke="'+k+'" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+    mouth='<path d="M10.5 19 Q16 26 21.5 19 Z" fill="'+k+'"/><path d="M13 22.6 q3 1.6 6 0" stroke="#e86a7a" stroke-width="1.6" fill="none"/>';
+    extra='<circle cx="8.5" cy="19" r="1.8" fill="#f6a3ae" opacity=".7"/><circle cx="23.5" cy="19" r="1.8" fill="#f6a3ae" opacity=".7"/>';}
+  else if(r==="l"){eyes='<path d="M9.5 12 L14 14 M22.5 12 L18 14" stroke="'+k+'" stroke-width="1.7" stroke-linecap="round"/><circle cx="12.5" cy="16" r="1.4" fill="'+k+'"/><circle cx="19.5" cy="16" r="1.4" fill="'+k+'"/>';
+    mouth='<path d="M11.5 23 Q16 18.5 20.5 23" stroke="'+k+'" stroke-width="1.7" fill="none" stroke-linecap="round"/>';
+    extra='<path d="M23.5 5.5 l1.5 2.2 l2.2 -1.4 M25 9 l2.4 .4" stroke="#d6263b" stroke-width="1.3" stroke-linecap="round" fill="none"/>';}
+  else if(r==="d"){eyes='<circle cx="12.5" cy="15" r="1.4" fill="'+k+'"/><circle cx="19.5" cy="15" r="1.4" fill="'+k+'"/>';
+    mouth='<path d="M12 21 H20" stroke="'+k+'" stroke-width="1.7" stroke-linecap="round"/>';}
+  else {eyes='<path d="M10.5 15 q2 2 4 0 M17.5 15 q2 2 4 0" stroke="'+k+'" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
+    mouth='<circle cx="16" cy="21" r="1.6" fill="none" stroke="'+k+'" stroke-width="1.4"/>';
+    extra='<path d="M24 4.5 q2 3.4 0 4.6 q-2 -1.2 0 -4.6z" fill="#4aa3d8"/><path d="M7 5 q1.4 2.4 0 3.3 q-1.4 -.9 0 -3.3z" fill="#4aa3d8"/>';}
+  return '<svg class="face" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#fff" stroke="#d4d4d4" stroke-width="1"/>'+
+    '<path d="M5.5 8 Q10 16 5.5 24" stroke="'+st+'" stroke-width="1.2" fill="none" stroke-dasharray="1.8 1.4"/><path d="M26.5 8 Q22 16 26.5 24" stroke="'+st+'" stroke-width="1.2" fill="none" stroke-dasharray="1.8 1.4"/>'+eyes+mouth+extra+'</svg>';
+}
+function badge(style,r){
+  var x=RES[r];
+  if(style===1) return '<span class="rb rb1" style="background:'+x.c+'">'+x.t+'</span>';
+  if(style===2) return '<span class="rb rb2" style="color:'+x.c+';border-color:'+x.c+'">'+x.h+'</span>';
+  return faceSvg(r);
+}
+function result(style,r,team){
+  return logo(Math.max(0,TEAM.indexOf(team)),' style="width:1.35em;height:1.35em"')+'<span class="mini-b">'+badge(style,r)+'</span>';
+}
+function cornerMock(o){
+  return '<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(7,' style="width:2.1em;height:2.1em"')+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
+}
+var EVENTS=[["개막전","#c8102e"],["올스타","#b8862b"],["가을야구","#d9692b"],["직관","#1c2a4a"],["국제경기","#2f5fc4"]];
+var FANS=[["말소","#7d8591"],["등록","#2f7d4f"],["부상","#c8102e"],["대체선수","#6a4fb3"],["FA 영입","#b8862b"],["계약해지","#3a3f4a"],["계약완료","#1c2a4a"],["트레이드","#d9692b"]];
+function eventSheet(){
+  return '<div class="sheetcard"><div class="sh"><span>EVENT STICKER</span><span>기본 5종</span></div><div class="evrow">'+
+    EVENTS.map(function(e){return '<span class="evs" style="--c:'+e[1]+'">'+e[0]+'</span>'}).join("")+'</div>'+
+    '<div class="evcell"><span class="d">3</span><span class="evs sm" style="--c:#c8102e">개막전</span><span class="d2">달력에 붙인 모습</span></div></div>';
+}
+function fanSheet(){
+  return '<div class="sheetcard"><div class="sh"><span>찐팬 STICKER</span><span>기본 8종 · 이름 칸</span></div><div class="fanrow">'+
+    FANS.map(function(f,i){return '<span class="fan" style="--c:'+f[1]+'"><b>'+f[0]+'</b><i>'+(i===1?'○○○ 선수':'')+'</i></span>'}).join("")+'</div></div>';
+}
+function resultMock(o){
+  var h=["w","l","d","c"].map(function(r){return '<div class="rbcell">'+badge(o.sticker,r)+'<span>'+RES[r].t+'</span></div>'}).join("");
+  return '<div class="mk"><div class="rbrow" style="margin-left:4.6em">'+h+'</div></div>';
+}
+var GAMES=(function(){
+  // 2027년 6월: 월요일만 쉬고 매일 경기. 화~목, 금~일 3연전 단위로 상대와 홈/원정이 바뀌어요.
+  var g={}, first=new Date(2027,5,1).getDay(), pat="wlwwldwlwlwwlwlwwdlw".split(""), k=0, series=0;
+  for(var d=1;d<=30;d++){
+    var wd=(first+d-1)%7; if(wd===1) continue;
+    if(wd===2||wd===5) series++;
+    g[d]=[pat[k++%pat.length],series%10,series%2===1];
+  }
+  g[10][0]="c";
+  return g;
+})();
+var EXTRAS={3:["fan","부상"],5:["ev","직관"],17:["fan","등록"],19:["ev","직관"],24:["fan","트레이드"],29:["fan","말소"]};
+function stadiumSvg(c){
+  return '<svg viewBox="0 0 120 70" class="art" aria-hidden="true" fill="none" stroke="'+c+'" stroke-width="1.3" stroke-linecap="round">'+
+  '<ellipse cx="60" cy="44" rx="50" ry="18"/><ellipse cx="60" cy="42" rx="38" ry="11"/><ellipse cx="60" cy="41" rx="24" ry="6" stroke-dasharray="2 2"/>'+
+  '<path d="M10 44 V54 Q60 78 110 54 V44"/><path d="M22 52 V62 M40 58 V68 M60 60 V70 M80 58 V68 M98 52 V62"/>'+
+  '<path d="M18 36 V14 M102 36 V14"/><rect x="13" y="8" width="10" height="6" rx="1"/><rect x="97" y="8" width="10" height="6" rx="1"/>'+
+  '<path d="M52 41 L60 37 L68 41 L60 45 Z"/><path d="M30 10 q4 -3 8 0 M80 6 q4 -3 8 0" stroke-width="1"/></svg>';
+}
+function playerSvg(c){
+  return '<svg viewBox="0 0 60 70" class="art pl" aria-hidden="true" fill="none" stroke="'+c+'" stroke-width="1.4" stroke-linecap="round">'+
+  '<path d="M20 22 q10 -12 22 0 l3 2 h-28 z" fill="'+c+'" fill-opacity=".15"/><circle cx="31" cy="30" r="8"/>'+
+  '<path d="M16 66 q2 -20 15 -24 q13 4 15 24"/><path d="M44 48 L56 22" stroke-width="2.4"/><path d="M27 52 h8"/></svg>';
+}
+function ruleSvg(c,c2){
+  return '<svg viewBox="0 0 80 60" class="art" aria-hidden="true" fill="none" stroke="'+c+'" stroke-width="1.3">'+
+  '<path d="M40 8 L68 32 L40 56 L12 32 Z"/><rect x="37" y="5" width="6" height="6" transform="rotate(45 40 8)" fill="#fff"/>'+
+  '<circle cx="68" cy="32" r="3" fill="'+c2+'" stroke="none"/><circle cx="40" cy="8" r="3" fill="'+c2+'" stroke="none"/>'+
+  '<path d="M40 30 q6 -14 14 -18" stroke-dasharray="2 2"/><circle cx="55" cy="11" r="2.5" fill="#fff"/></svg>';
+}
+function topSlot(n,p){
+  if(n===1) return '<div class="slot top s1">'+stadiumSvg(p.main)+'<span class="cap">6월의 구장</span></div>';
+  if(n===2) return '<div class="slot top s2">'+playerSvg(p.main)+'<div class="bio"><b>전설의 에이스</b><i></i><i></i><i></i><i style="width:60%"></i></div></div>';
+  return '<div class="slot top s3">'+ruleSvg(p.main,p.accent2)+'<span class="cap">Q. 인필드 플라이?</span></div>';
+}
+function bottomSlot(n,p){
+  if(n===1){
+    var first=new Date(2027,6,1).getDay(), h='<div class="mini"><span class="mt">JULY</span><div class="mg">';
+    ["S","M","T","W","T","F","S"].forEach(function(w,i){h+='<span class="'+(i===0?"sun":"")+'">'+w+'</span>'});
+    for(var i=0;i<35;i++){var d=i-first+1;h+='<span class="'+(i%7===0?"sun":"")+'">'+(d>=1&&d<=31?d:"")+'</span>'}
+    return '<div class="slot bot b1">'+h+'</div></div></div>';
+  }
+  if(n===2) return '<div class="slot bot b2"><span class="lab">이달의 MVP</span><div class="mvp"><span class="frame">★</span><div class="lines"><i></i><i></i></div></div></div>';
+  return '<div class="slot bot b3"><span class="lab">직관 · 원정 후기</span><div class="kv"><span>날짜</span><i></i><span>구장</span><i></i></div><i class="ln"></i><i class="ln"></i></div>';
+}
+function sidePanel(o,p,focus){
+  return '<div class="side'+(focus?" focus-"+focus:"")+'"><div class="mon"><span class="m">6</span><span class="t">JUNE 2027</span></div>'+topSlot(o.top,p)+bottomSlot(o.bottom,p)+'</div>';
+}
+function sideMock(o,focus){
+  var p=MOODS[o.mood];
+  return '<div class="mk" style="'+vars(o.mood)+'"><div class="cal sideonly">'+sidePanel(o,p,focus)+'<div class="peek"></div></div></div>';
+}
+var GAMES=(function(){
+  // 2027년 6월: 월요일만 쉬고 매일 경기. 화~목, 금~일 3연전 단위로 상대와 홈/원정이 바뀌어요.
+  var g={}, first=new Date(2027,5,1).getDay(), pat="wlwwldwlwlwwlwlwwdlw".split(""), k=0, series=0;
+  for(var d=1;d<=30;d++){
+    var wd=(first+d-1)%7; if(wd===1) continue;
+    if(wd===2||wd===5) series++;
+    g[d]=[pat[k++%pat.length],series%10,series%2===1];
+  }
+  g[10][0]="c";
+  return g;
+})();
+var EXTRAS={3:["fan","부상"],5:["ev","직관"],17:["fan","등록"],19:["ev","직관"],24:["fan","트레이드"],29:["fan","말소"]};
+function calMock(o){
+  var l=o.layout,m=o.mood,s=o.sticker,p=MOODS[m];
+  var first=new Date(2027,5,1).getDay(), days=30, cells="";
+  ["SUN","MON","TUE","WED","THU","FRI","SAT"].forEach(function(w,i){cells+='<div class="dw'+(i===0?" sun":"")+'">'+w+'</div>'});
+  for(var i=0;i<35;i++){
+    var d=i-first+1, inM=d>=1&&d<=days, sun=i%7===0, stk="", corner="", pos="";
+    if(inM&&GAMES[d]){
+      var g=GAMES[d], dot=(d%2?p.main:p.accent2);
+      var home=g[2], lg=logo(g[1],' style="width:1.35em;height:1.35em"'), bd='<span class="mini-b">'+badge(s,g[0])+'</span>';
+      if(o.homeaway===1){ corner=bd; stk=lg; pos=home?"aw":"hm"; }
+      else if(o.homeaway===2){ corner='<span class="hatag" style="background:'+(home?p.main:p.accent2)+';font-size:.42em">'+(home?"HOME":"AWAY")+'</span>'; stk=lg+bd; }
+      else stk=lg+bd;
+    }
+    var xt="";
+    if(inM&&EXTRAS[d]){var e=EXTRAS[d];
+      if(e[0]==="ev"){var ec=(EVENTS.filter(function(x){return x[0]===e[1]})[0]||["","#1c2a4a"])[1]; xt='<span class="xtra"><span class="xev" style="background:'+ec+'">★ '+e[1]+'</span></span>';}
+      else {var fc=(FANS.filter(function(x){return x[0]===e[1]})[0]||["","#7d8591"])[1]; xt='<span class="xtra"><span class="xfan" style="--c:'+fc+'"><b>'+e[1]+'</b><i>○○○</i></span></span>';}
+    }
+    var printed=(inM&&o.homeaway===1)?'<span class="haw"><i>HOME</i><i>AWAY</i></span>':"";
+    cells+='<div class="dc'+(sun?" sun":"")+'">'+(inM?'<span class="d">'+d+'</span>':"")+printed+(corner?'<span class="rbc">'+corner+'</span>':"")+(stk?'<span class="stk'+(pos?" on-"+pos:"")+'">'+stk+'</span>':"")+xt+'</div>';
+  }
+  var extra = l===2?'<div class="memo"><span class="lab">한 줄 후기</span><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>'
+           : l===3?'<div class="free">자유롭게<br>꾸미는 칸</div>':"";
+  return '<div class="mk l'+l+'" style="'+vars(m)+'"><div class="cal wide">'+sidePanel(o,p)+
+    '<div class="body"><div class="grid">'+cells+'</div>'+extra+'</div></div><div class="stand"></div></div>';
+}
+function sheetMock(o,wide){
+  var s=o.sticker,m=o.mood,pk=o.pack,p=MOODS[m];
+  function sec(t,items){return '<div class="sec"><span class="st">'+t+'</span><div class="items">'+items+'</div></div>'}
+  var res=["w","l","d","c","w","l"].map(function(r){return '<span class="mini-b" style="font-size:.62em">'+badge(s,r)+'</span>'}).join("");
+  var dots=[p.main,p.main,p.accent2,p.accent2,p.main,p.accent2].map(function(c){return '<span class="dot" style="background:'+c+';width:.8em;height:.8em"></span>'}).join("");
+  var ev=["개막전","올스타","가을야구","직관","국제경기"].map(function(t,i){return '<span class="ev" style="color:'+(i%2?p.main:p.accent2)+'">'+t+'</span>'}).join("");
+  var ha=o.homeaway===2?sec("홈 · 원정",'<span class="hatag" style="background:'+p.main+'">HOME</span><span class="hatag" style="background:'+p.accent2+'">AWAY</span><span class="hatag" style="background:'+p.main+'">HOME</span><span class="hatag" style="background:'+p.accent2+'">AWAY</span>'):"";
+  var html=sec("경기 결과",res)+ha+sec("이벤트",ev);
+  html+=sec("찐팬",FANS.slice(0,4).map(function(f){return '<span class="hatag" style="background:'+f[1]+'">'+f[0]+' ___</span>'}).join(""));
+  html+=sec("상대팀 로고",TEAM.map(function(c,i){return logo(i,' style="width:1.5em;height:1.5em"')}).join(""));
+  return '<div class="mk" style="'+vars(m)+'"><div class="sheet'+(wide?" wide":"")+'"><div class="sh"><span>STICKER SHEET</span><span></span></div>'+html+'</div></div>';
+}
+function packMock(o){
+  var pk=o.pack;
+  function row(name,sub,state,price){
+    var box=state==="fixed"?'<span class="ck fixed">포함</span>':state==="on"?'<span class="ck on">✓</span>':'<span class="ck"></span>';
+    return '<div class="orow '+state+'">'+box+'<span class="on-name"><b>'+name+'</b><small>'+sub+'</small></span><span class="pr">'+price+'</span></div>';
+  }
+  var h='<div class="oform"><div class="ohead"><span>주문 화면 예시</span><b>'+(pk===1?"선택 없음 · 한 가지":"고객이 직접 골라요")+'</b></div>';
+  if(pk===1){
+    h+=row("올인원 세트","달력 + 상대팀 · 결과 · 이벤트 · 찐팬 스티커","fixed","단일가");
+  } else {
+    h+=row("기본 세트","달력 + 상대팀 · 경기 결과 스티커","fixed","기본가");
+    h+='<div class="osub">추가 옵션 (원하는 것만 체크)</div>';
+    h+=row("이벤트 스티커","개막전 · 올스타 · 가을야구 …","on","+ 추가금");
+    h+=row("찐팬 스티커","말소 · 등록 · 부상 · 트레이드 …","off","+ 추가금");
+    if(pk===3){
+      h+=row("선물용 커버","포장 + 첫 장 메시지","on","+ 추가금");
+      h+='<div class="omsg"><span>첫 장 메시지</span><i>To. 아빠, 올해도 같이 직관 가요!</i></div>';
+    }
+  }
+  return '<div class="mk">'+h+'</div></div>';
+}
+function materialMock(o){
+  var mt=o.material, p=MOODS[o.mood];
+  var paper={1:"#fbfbf8",2:"#f6f2ea",3:"#c4a27c"}[mt];
+  var tex={1:"",2:"repeating-linear-gradient(45deg,rgba(0,0,0,.025) 0 2px,transparent 2px 5px),",3:"radial-gradient(rgba(80,50,20,.18) 1px,transparent 1.5px) 0 0/.5em .5em,"}[mt];
+  var stickerBg=mt===3?"rgba(255,255,255,.25)":"#fff";
+  var stickerBorder=mt===3?"1px solid rgba(255,255,255,.7)":"1px solid #ddd";
+  var peel=mt===2?'<span style="position:absolute;right:-.2em;bottom:-.2em;width:1.4em;height:1.4em;background:linear-gradient(135deg,#fff 50%,#e6e6e6 50%);border-radius:0 0 .3em 0;box-shadow:-.1em -.1em .2em rgba(0,0,0,.15)"></span>':"";
+  var finish={1:"무광",2:"재부착",3:"투명"}[mt];
+  return '<div class="mk"><div style="display:flex;gap:1em;align-items:center"><div class="swatch" style="background:'+tex+paper+'"><span style="position:absolute;left:.7em;bottom:.6em;font-family:var(--hand);font-size:.9em;color:#333">오늘 직관 승!</span></div>'+
+    '<div style="position:relative;width:5em;height:5em;border-radius:.5em;background:'+stickerBg+';border:'+stickerBorder+';display:grid;place-items:center;box-shadow:0 .3em .8em -.4em rgba(0,0,0,.45)">'+ballSvg("happy",p.accent2).replace('class="ball"','class="ball" style="width:3em;height:3em"')+peel+'</div></div>'+
+    '<div style="margin-top:.6em;font-size:.75em;color:var(--muted)">종이 · 스티커('+finish+')</div></div>';
+}
+function haMock(o){
+  var p=MOODS[o.mood], n=o.homeaway, team=TEAM[2];
+  var opp=logo(7);
+  var inner, cap;
+  if(n===1){inner='<div class="words"><span>HOME</span><span class="aw">AWAY<span class="drop">'+opp+'</span></span></div>';cap="홈 경기: AWAY 자리에 상대팀 스티커";}
+  else if(n===2){inner='<div class="pair"><span class="drop">'+opp+'</span><span class="drop d2"><span class="hatag" style="background:'+p.main+'">HOME</span></span></div>';cap="상대팀 + HOME 스티커 두 장";}
+  else {inner='<div class="pair"><span class="drop">'+opp+'</span></div>';cap="상대팀 스티커 한 장";}
+  return '<div class="mk" style="'+vars(o.mood)+'"><div class="hacell"><span class="hd14">14</span>'+inner+'</div><span class="hacap">'+cap+'</span></div>';
+}
+function cur(){return {top:v("top"),bottom:v("bottom"),homeaway:v("homeaway"),layout:v("layout"),mood:v("mood"),sticker:v("sticker"),pack:v("pack"),material:v("material")}}
+function mockFor(key,opt){
+  var o=cur(); o[key]=opt;
+  if(key==="homeaway") return {html:haMock(o),size:1.3};
+  if(key==="top"||key==="bottom") return {html:sideMock(o,key),size:1.02};
+  if(key==="mood") return {html:calMock(o),size:.74};
+  if(key==="sticker") return {html:resultMock(o)+cornerMock(o),size:1.6};
+  if(key==="pack") return {html:packMock(o),size:(o.pack===3?1.05:1.2)};
+  return {html:materialMock(o),size:1.7};
+}
+
+function cellFigure(){
+  var navy="#1c2a4a", red="#c8102e";
+  return '<svg viewBox="-6 -5 33 31" role="img" aria-label="20.5 x 19.5mm 날짜 칸 안에 상대팀 9mm, 결과 6mm, 홈 태그 7x4mm, 이벤트 16x4.5mm 스티커 배치">'+
+  '<rect x="0" y="0" width="20.5" height="19.5" fill="#f7f5ef" stroke="#b9b4a6" stroke-width=".15"/>'+
+  '<text x="1" y="3.2" font-size="2.8" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="'+navy+'">14</text>'+
+  '<text x="13.2" y="3.4" font-size="1.7" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="#fff"><tspan></tspan></text>'+
+  '<rect x="12" y="1.2" width="7" height="4" rx=".8" fill="'+navy+'"/><text x="15.5" y="3.9" text-anchor="middle" font-size="2" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="#fff">HOME</text>'+
+  '<image href="stk/landers.png" x="1.8" y="5.2" width="9" height="9"/>'+
+  '<circle cx="15.3" cy="9.7" r="3" fill="#d6263b" stroke="#fff" stroke-width=".35"/><text x="15.3" y="10.6" text-anchor="middle" font-size="2.4" font-weight="700" fill="#fff" font-family="Noto Sans KR,sans-serif">승</text>'+
+  '<rect x="2.25" y="14.6" width="16" height="4.5" rx="2.25" fill="'+red+'"/><text x="10.25" y="17.6" text-anchor="middle" font-size="2.3" font-weight="700" fill="#fff" font-family="Noto Sans KR,sans-serif">★ 개막전</text>'+
+  '<g stroke="#8a8f99" stroke-width=".12" fill="#8a8f99" font-size="1.6" font-family="Barlow Condensed,sans-serif">'+
+  '<line x1="0" y1="-2" x2="20.5" y2="-2"/><line x1="0" y1="-2.6" x2="0" y2="-1.4"/><line x1="20.5" y1="-2.6" x2="20.5" y2="-1.4"/><text x="10.25" y="-2.6" text-anchor="middle" stroke="none">20.5mm</text>'+
+  '<line x1="-2" y1="0" x2="-2" y2="19.5"/><line x1="-2.6" y1="0" x2="-1.4" y2="0"/><line x1="-2.6" y1="19.5" x2="-1.4" y2="19.5"/><text x="-2.8" y="9.75" text-anchor="middle" stroke="none" transform="rotate(-90 -2.8 9.75)">19.5mm</text>'+
+  '<text x="6.3" y="22.3" text-anchor="middle" stroke="none">상대팀 9</text><text x="15.3" y="22.3" text-anchor="middle" stroke="none">결과 6</text><text x="22.6" y="3.8" stroke="none">홈 7×4</text><text x="10.25" y="24.6" text-anchor="middle" stroke="none">이벤트 16 × 4.5</text>'+
+  '</g></svg>';
+}
+/* ---------- slides ---------- */
+var stage=document.getElementById("stage");
+function el(h){var t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstChild}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var LISTS=[
+  {kind:"event",q:"이벤트 스티커",title:"이벤트 스티커, 기본 5종에 무엇을 더할까?",hint:"기본: 개막전, 올스타, 가을야구, 직관, 국제경기.",sheet:eventSheet,label:"더 넣고 싶은 이벤트",ph:"예: 끝내기 홈런, 노히트노런, 은퇴식"},
+  {kind:"fan",q:"찐팬 스티커",title:"찐팬 스티커, 선수 이름을 써넣는 8종",hint:"스티커 뒤쪽 빈칸에 선수 이름을 직접 써요.",sheet:fanSheet,label:"더 넣고 싶은 찐팬 스티커나 의견",ph:"예: 1군 콜업, 데뷔 첫 승, 이름 칸을 더 길게"}
+];
+var SLIDES=[{t:"base"},{t:"overview"}];
+D.forEach(function(x){SLIDES.push({t:"d",x:x}); if(x.key==="sticker") LISTS.forEach(function(l){SLIDES.push({t:"list",l:l})})});
+SLIDES.push({t:"sum"}); SLIDES.push({t:"size"});
+var N=SLIDES.length, SLIDE_OF={};
+function pg(n){return '<div class="pg">'+String(n).padStart(2,"0")+' / '+String(N).padStart(2,"0")+'</div>'}
+
+function build(){
+  stage.innerHTML="";
+  SLIDES.forEach(function(S,n){
+    var h;
+    if(S.t==="base"){
+      h='<section class="slide"><div class="in"><div class="eyebrow">2027 Baseball Calendar · 기본 모형 (확정)</div>'+
+        '<h1>2027 야구 달력은 이렇게 만들어요</h1><div class="basegrid"><div class="basefacts">'+
+        '<div class="bf"><span>FORM</span><b>가로 탁상형</b><p>책상 위에 세워 두는 스프링 탁상 달력</p></div>'+
+        '<div class="bf"><span>COLOR</span><b>클래식 볼파크</b><p>네이비와 레드, 아이보리 종이</p></div>'+
+        '<div class="bf"><span>LAYOUT</span><b>왼쪽 패널 + 월 달력</b><p>왼쪽에 월 · 그림 칸 · 작은 칸, 오른쪽에 한 달 날짜. 경기는 스티커로 기록해요.</p></div>'+
+        '</div><div class="preview" id="coverPrev"></div></div></div>'+pg(n+1)+'</section>';
+    } else if(S.t==="overview"){
+      h='<section class="slide"><div class="in"><div class="eyebrow">다음 단계 · 정할 것</div>'+
+        '<h1>이제 몇 가지만 정하면 돼요</h1><p class="lead2">항목을 누르면 해당 장으로 가요. 고른 카드를 한 번 더 누르면 선택이 풀리고, 아래 <b>선택 초기화</b>로 전부 지울 수 있어요.</p>'+
+        '<div class="ovgrid" id="coverList"></div><p class="status" id="st0"></p></div>'+pg(n+1)+'</section>';
+    } else if(S.t==="d"){
+      var x=S.x, di=D.indexOf(x); SLIDE_OF[x.key]=n;
+      var cards=x.opts.map(function(o,j){
+        return '<button type="button" class="opt" data-k="'+x.key+'" data-o="'+(j+1)+'" aria-pressed="false"><span class="badge">선택됨</span><span class="no">OPTION '+(j+1)+'</span><div class="stage-mock"></div><h3>'+esc(o.t)+'</h3><p class="desc">'+esc(o.d)+'</p><div class="facts">'+o.f.map(function(f){return '<span class="fact">'+esc(f[0])+' <b>'+esc(f[1])+'</b></span>'}).join("")+'</div></button>';
+      }).join("");
+      h='<section class="slide"><div class="in"><div class="top"><span class="eyebrow">결정 '+(di+1)+' / '+D.length+' · '+esc(x.q)+'</span><span class="hint">'+esc(x.hint)+'</span></div><h2>'+esc(x.title)+'</h2><div class="opts">'+cards+'</div></div>'+pg(n+1)+'</section>';
+    } else if(S.t==="list"){
+      var l=S.l; SLIDE_OF["list-"+l.kind]=n;
+      h='<section class="slide"><div class="in"><div class="top"><span class="eyebrow">스티커 구성 · '+esc(l.q)+'</span><span class="hint">'+esc(l.hint)+'</span></div><h2>'+esc(l.title)+'</h2>'+
+        '<div class="listgrid"><div class="sheetbox">'+l.sheet()+'</div><div class="ideas"><label class="ilab" for="in-'+l.kind+'">'+esc(l.label)+'</label>'+
+        '<form class="add" data-kind="'+l.kind+'"><input id="in-'+l.kind+'" maxlength="40" autocomplete="off" placeholder="'+esc(l.ph)+'"><button type="submit">추가</button></form>'+
+        '<ul class="ichips" id="list-'+l.kind+'"></ul><p class="status">적은 내용은 이 보드를 보는 사람 모두에게 보여요.</p></div></div></div>'+pg(n+1)+'</section>';
+    } else if(S.t==="sum"){
+      h='<section class="slide"><div class="in"><div class="eyebrow">Summary · 고른 조합</div><h2 id="sumTitle">지금 고른 조합으로 만든 샘플</h2>'+
+        '<div class="sumgrid"><div class="list"><div class="list" id="sumList"></div><label class="status" for="note">결정 메모 (함께 볼 사람에게 남길 말)</label><textarea class="note" id="note" placeholder="예: 스티커는 표정 공으로, 대신 결과 배지도 같이 넣기"></textarea></div>'+
+        '<div class="preview col" id="sumPrev"></div></div></div>'+pg(n+1)+'</section>';
+    } else {
+      h='<section class="slide"><div class="in"><div class="top"><span class="eyebrow">Size Guide · 크기 예측</span><span class="hint">예측치예요. 인쇄소 규격과 샘플 출력으로 확정해요.</span></div>'+
+        '<h2>날짜 한 칸 약 20 × 19mm, 스티커는 이 크기로</h2><div class="sizegrid"><div style="display:flex;flex-direction:column;gap:1.2cqi;min-width:0">'+
+        '<div class="assume"><span class="fact">달력 판형 <b>220 × 150mm 가정</b></span><span class="fact">왼쪽 패널 <b>55mm</b></span><span class="fact">날짜 영역 <b>144 × 118mm</b></span><span class="fact">한 칸 <b>약 20.5 × 19.5mm (6주 달)</b></span><span class="fact">5주 달은 <b>약 20.5 × 23.5mm</b></span></div>'+
+        '<table class="stab"><thead><tr><th>스티커</th><th>권장 크기</th><th>시즌 수량 참고</th></tr></thead><tbody>'+
+        '<tr><td>상대팀 로고 <small>(기본)</small></td><td><b>지름 9mm</b></td><td>9개 구단 × 16경기, 구단별 18장</td></tr>'+
+        '<tr><td>경기 결과 <small>(기본)</small></td><td>원형 <b>지름 6mm</b> · 손글씨 <b>8 × 6mm</b> · 야구공 <b>지름 7mm</b></td><td>144경기: 승 · 패 각 80, 무 10, 취소 15</td></tr>'+
+        '<tr><td>홈 · 원정 <small>(옵션 2)</small></td><td>태그 <b>7 × 4mm</b> · 옵션 1은 인쇄 글자 높이 2mm</td><td>홈 · 원정 각 75</td></tr>'+
+        '<tr><td>이벤트</td><td><b>16 × 4.5mm</b> 라벨</td><td>종류별 3~10장</td></tr>'+
+        '<tr><td>찐팬 (이름 칸)</td><td><b>18 × 4.5mm</b> (글자 7 + 이름 11mm)</td><td>종류별 5~10장</td></tr>'+
+        '</tbody></table><p class="status">한 칸에 가장 많이 붙는 경우: 상대팀 + 결과 + 이벤트(또는 찐팬) 3장, 홈 · 원정 스티커를 쓰면 4장. 오른쪽 그림처럼 위 줄 17mm, 아래 줄 16mm에 들어가요.</p></div>'+
+        '<div class="cellfig">'+cellFigure()+'<p>실제 비율로 그린 날짜 한 칸 (6주 달 기준)</p></div></div></div>'+pg(n+1)+'</section>';
+    }
+    var sec=el(h);
+    if(S.t!=="sum"){var jb=document.createElement("button");jb.type="button";jb.className="jump";jb.textContent="☰ 고른 조합 보기";jb.setAttribute("aria-label","고른 조합 페이지로 이동");jb.addEventListener("click",function(e){e.stopPropagation();show(SLIDES.findIndex(function(x){return x.t==="sum"}))});sec.insertBefore(jb,sec.firstChild)}
+    stage.appendChild(sec);
+  });
+  stage.querySelectorAll(".opt").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();choose(b.dataset.k,+b.dataset.o)})});
+  stage.querySelectorAll("form.add").forEach(function(f){
+    f.addEventListener("click",function(e){e.stopPropagation()});
+    f.addEventListener("submit",function(e){e.preventDefault();var inp=f.querySelector("input"),t=inp.value.trim();if(!t)return;addIdea(f.dataset.kind,t);inp.value=""});
+  });
+  stage.querySelectorAll("input,textarea").forEach(function(x){x.addEventListener("keydown",function(e){e.stopPropagation()})});
+  var note=document.getElementById("note");
+  note.addEventListener("click",function(e){e.stopPropagation()});
+  var nt; note.addEventListener("input",function(){clearTimeout(nt);nt=setTimeout(function(){state.note=note.value;persist()},700)});
+}
+function ideaCount(kind){return ideas.filter(function(x){return x.kind===kind}).length}
+function rowsHTML(){
+  var rows=[],n=0;
+  D.forEach(function(x){
+    var c=state[x.key]; n++;
+    rows.push('<button type="button" class="row" data-go="'+SLIDE_OF[x.key]+'"><span class="n">'+n+'</span><span class="k">'+esc(x.q)+'</span><span class="v'+(c?" done":"")+'">'+(c?"OPTION "+c+" · "+esc(x.opts[c-1].t):"아직 안 정했어요")+'</span></button>');
+    if(x.key==="sticker") LISTS.forEach(function(l){
+      var k=ideaCount(l.kind); n++;
+      rows.push('<button type="button" class="row" data-go="'+SLIDE_OF["list-"+l.kind]+'"><span class="n">'+n+'</span><span class="k">'+esc(l.q)+'</span><span class="v done">기본 '+(l.kind==="event"?5:8)+'종'+(k?" + 의견 "+k+"개":"")+'</span></button>');
+    });
+  });
+  return rows.join("");
+}
+function renderIdeas(){
+  LISTS.forEach(function(l){
+    var ul=document.getElementById("list-"+l.kind), items=ideas.filter(function(x){return x.kind===l.kind});
+    ul.innerHTML=items.length?items.map(function(x){return '<li><span>'+esc(x.text)+'</span><button type="button" data-id="'+esc(x.id)+'" aria-label="'+esc(x.text)+' 지우기">×</button></li>'}).join(""):'<li class="empty">아직 없어요. 위 칸에 적고 추가를 눌러 주세요.</li>';
+    ul.querySelectorAll("button").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();removeIdea(b.dataset.id)})});
+  });
+}
+function render(){
+  stage.querySelectorAll(".opt").forEach(function(b){
+    var k=b.dataset.k,o=+b.dataset.o, sel=state[k]===o;
+    b.classList.toggle("sel",sel); b.setAttribute("aria-pressed",sel?"true":"false");
+    var m=mockFor(k,o), box=b.querySelector(".stage-mock");
+    box.innerHTML=m.html; box.firstChild.style.setProperty("--mk",m.size+"cqi"); box.firstChild.style.setProperty("--mk-m",(m.size*6)+"px");
+  });
+  var done=D.filter(function(x){return state[x.key]}).length;
+  ["coverList","sumList"].forEach(function(id){var e=document.getElementById(id);e.innerHTML=rowsHTML();
+    e.querySelectorAll(".row").forEach(function(r){r.addEventListener("click",function(ev){ev.stopPropagation();show(+r.dataset.go)})})});
+  var o=cur();
+  var cp=document.getElementById("coverPrev"); cp.innerHTML=calMock(o); cp.firstChild.style.setProperty("--mk","1.36cqi"); cp.firstChild.style.setProperty("--mk-m","8px");
+  var sp=document.getElementById("sumPrev"); sp.innerHTML=calMock(o)+sheetMock(o,true);
+  sp.children[0].style.setProperty("--mk","1.05cqi"); sp.children[1].style.setProperty("--mk","1.05cqi");
+  sp.children[0].style.setProperty("--mk-m","8px"); sp.children[1].style.setProperty("--mk-m","9px");
+  document.getElementById("sumTitle").textContent = done===D.length?"이 조합으로 샘플 출력을 맡겨요":"지금 고른 조합으로 만든 샘플 ("+done+"/"+D.length+" 결정)";
+  var note=document.getElementById("note"); if(document.activeElement!==note) note.value=state.note||"";
+  document.getElementById("st0").textContent=done+"/"+D.length+" 결정 · 정하지 않은 항목은 OPTION 1로 미리 보여요.";
+  [].forEach.call(dots.children,function(x,k){var S=SLIDES[k];x.classList.toggle("done",!!(S&&S.t==="d"&&state[S.x.key]))});
+  renderIdeas();
+}
+function choose(k,o){state[k]=state[k]===o?null:o; render(); persist()}
+
+/* ---------- persistence ---------- */
+var saveEl=document.getElementById("save"), ideas=[], ideasCol=null, LSI="baseball-cal-ideas-v1";
+try{ideas=JSON.parse(localStorage.getItem(LSI)||"[]")||[]}catch(e){ideas=[]}
+function saveLocalIdeas(){try{localStorage.setItem(LSI,JSON.stringify(ideas))}catch(e){}}
+function persist(){
+  try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}
+  if(!ref){saveEl.textContent="이 브라우저에 저장됨";return}
+  var body={}; D.forEach(function(x){body[x.key]=state[x.key]}); body.note=state.note||""; body.updatedAt=new Date().toISOString();
+  saveEl.textContent="저장 중…";
+  writing=writing.then(function(){return ref.set(body)}).then(function(){saveEl.textContent="저장됨 · 공유 중"},function(e){
+    saveEl.textContent=(e&&e.code==="invalid_argument")?"보기 전용이에요 (이 브라우저에만 저장)":"저장 실패 · 이 브라우저에만 저장됨";
+  });
+}
+function addIdea(kind,text){
+  if(ideasCol){
+    saveEl.textContent="저장 중…";
+    ideasCol.add({kind:kind,text:text,createdAt:new Date().toISOString()}).then(function(){saveEl.textContent="저장됨 · 공유 중"},function(e){
+      saveEl.textContent=(e&&e.code==="invalid_argument")?"보기 전용이에요":"저장 실패";
+    });
+  } else {
+    ideas.push({id:"l"+Date.now(),kind:kind,text:text}); saveLocalIdeas(); render(); saveEl.textContent="이 브라우저에 저장됨";
+  }
+}
+function removeIdea(id){
+  if(ideasCol){ideasCol.doc(id).delete().catch(function(){saveEl.textContent="지우기 실패"})}
+  else {ideas=ideas.filter(function(x){return x.id!==id}); saveLocalIdeas(); render()}
+}
+if(window.claude&&window.claude.use){
+  window.claude.use("db").then(function(x){
+    if(!x) return; db=x; ref=db.doc("decisions/current"); ideasCol=db.collection("ideas");
+    ref.onSnapshot(function(snap){
+      if(!snap.exists){saveEl.textContent="공유 저장 준비됨";return}
+      var d=snap.data(); D.forEach(function(x){state[x.key]=d[x.key]||null}); state.note=d.note||"";
+      if(!snap.metadata.hasPendingWrites) saveEl.textContent="저장됨 · 공유 중";
+      render();
+    },function(){saveEl.textContent="이 브라우저에 저장됨"});
+    ideasCol.orderBy("createdAt").onSnapshot(function(q){
+      ideas=q.docs.map(function(d){var b=d.data();return {id:d.id,kind:b.kind,text:String(b.text||"")}});
+      render();
+    },function(){ideasCol=null});
+  });
+}
+
+/* ---------- navigation ---------- */
+var i=0, dots=document.getElementById("dots");
+build();
+for(var k=0;k<N;k++){(function(k){var b=document.createElement("button");b.type="button";b.setAttribute("aria-label",(k+1)+"번 슬라이드");b.onclick=function(){show(k)};dots.appendChild(b)})(k)}
+function show(n){
+  i=Math.max(0,Math.min(N-1,n));
+  stage.querySelectorAll(".slide").forEach(function(s,k){s.classList.toggle("on",k===i)});
+  [].forEach.call(dots.children,function(x,k){x.classList.toggle("on",k===i)});
+}
+document.getElementById("prev").onclick=function(){show(i-1)};
+(function(){var rb=document.getElementById("reset"),armed=0,t;
+  rb.onclick=function(){
+    if(!armed){armed=1;rb.classList.add("arm");rb.textContent="한 번 더 누르면 초기화";t=setTimeout(function(){armed=0;rb.classList.remove("arm");rb.textContent="선택 초기화"},4000);return}
+    clearTimeout(t);armed=0;rb.classList.remove("arm");rb.textContent="선택 초기화";
+    D.forEach(function(x){state[x.key]=null}); state.note=""; render(); persist(); saveEl.textContent="선택을 모두 지웠어요";
+  };
+})();
+document.getElementById("next").onclick=function(){show(i+1)};
+document.addEventListener("keydown",function(e){
+  if(e.key==="ArrowRight"||e.key==="PageDown"){e.preventDefault();show(i+1)}
+  if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();show(i-1)}
+});
+render(); show(0);
+saveEl.textContent=saveEl.textContent||"이 브라우저에 저장됨";
+})();
+</script>
+
+</body>
+</html>
