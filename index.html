@@ -290,6 +290,27 @@ p{margin:0;line-height:1.55}
 .jump:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .in{top:5cqi!important}
 @media (max-width:760px){.jump{position:static;display:block;margin:20px 14px -8px auto;font-size:12px;padding:4px 12px}}
+.dw.sat,.dc.sat .d{color:#2f5fc4}
+.dc .d .ah{display:inline-flex;gap:.15em;margin-left:.25em;font-size:.82em;color:var(--p-muted);vertical-align:.05em}
+.ah i,.ah14 i{font-style:normal;position:relative;display:inline-block;line-height:1}
+.ah i.on::after,.ah14 i.on::after{content:"";position:absolute;inset:-.28em -.32em;border:.1em solid #c8102e;border-radius:50%;transform:rotate(-8deg)}
+.ah14{position:absolute;left:2.6em;top:.65em;display:flex;gap:.45em;font-family:var(--num);font-weight:700;font-size:1.1em;color:var(--p-muted)}
+@media (prefers-reduced-motion:no-preference){.ah14 i.on::after{animation:circ 3.4s ease-out infinite;clip-path:inset(0 0 0 0)}}
+@keyframes circ{0%,25%{opacity:0;transform:rotate(-8deg) scale(1.4)}38%{opacity:1;transform:rotate(-8deg) scale(1)}90%{opacity:1}100%{opacity:0}}
+.stimg{width:100%;height:auto;display:block;border-radius:.2em;mix-blend-mode:multiply}
+.slot.top.s1{padding:0}
+.cal.sideonly.withthumbs{width:24em}
+.peek.thumbs{background:none;display:flex;flex-direction:column;justify-content:center;gap:.8em;padding-left:.8em;border-left:1px dashed var(--p-line)}
+.peek.thumbs figure{margin:0;display:flex;flex-direction:column;gap:.2em}
+.peek.thumbs img{width:100%;border-radius:.2em;mix-blend-mode:multiply}
+.peek.thumbs figcaption{font-family:var(--hand);font-size:.75em;color:var(--p-muted)}
+.evh{display:inline-flex;align-items:center;gap:.35em;font-family:var(--hand);font-weight:700;font-size:2cqi;line-height:1;color:var(--c);background:#fffdf7;border:.12em dashed var(--c);border-radius:.8em;padding:.35em .75em .4em;box-shadow:0 .12em .35em rgba(0,0,0,.18);white-space:nowrap;transform:rotate(-2deg)}
+.evh:nth-child(even){transform:rotate(2deg)}
+.evh b{font-family:var(--num);font-size:.8em;color:#fff;background:var(--c);border-radius:99px;min-width:1.3em;height:1.3em;padding:0 .3em;display:inline-grid;place-items:center}
+.evh.sm{font-size:1.2cqi}
+.evh.xs{font-size:.42em;border-width:.08em;padding:.2em .45em;gap:.2em;box-shadow:0 .06em .15em rgba(0,0,0,.2)}
+.evh.xs2{font-size:.62em}
+@media (max-width:760px){.evh{font-size:17px}.evh.sm{font-size:12px}}
 /* sticker sheet */
 .sheet{background:var(--p-sheet);border-radius:.6em;padding:.9em;box-shadow:0 .4em 1em -.5em rgba(0,0,0,.45);display:flex;flex-direction:column;gap:.55em;width:19em;color:var(--p-ink)}
 .sheet .sh{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--num);font-weight:700;font-size:.85em;letter-spacing:.08em}
@@ -361,7 +382,7 @@ var TEAM=["#c8102e","#0b2a5b","#e85d04","#1d6f42","#6a1b9a","#222222","#0077b6",
 
 var D=[
  {key:"top",q:"왼쪽 위 그림 칸",title:"왼쪽 위 그림 칸에는 무엇을 넣을까?",hint:"가로 탁상형(샘플 모양)은 확정이에요. 왼쪽 패널에 들어갈 내용을 정해요.",opts:[
-   {t:"구단 구장 그림",d:"달마다 다른 구장을 선 그림으로. 열두 달 넘기면 전 구장을 다 돌아요.",f:[["소장 포인트","구장 투어"],["제작","구장 일러스트 10~12장"],["검토","구장 디자인 사용"]]},
+   {t:"구단 구장 그림",d:"시즌 달은 구장 그림, 1월은 전지훈련(비행기 · 가방), 12월은 골든글러브.",f:[["소장 포인트","구장 투어"],["제작","일러스트 12장"],["검토","구장 디자인 사용"]]},
    {t:"전설의 선수 소개",d:"선수 그림 한 컷과 4~5줄 소개. 아이에게 들려줄 야구 이야기가 생겨요.",f:[["읽을거리","있음"],["제작","그림 + 원고 12편"],["검토","초상·성명권"]]},
    {t:"이달의 야구 룰 한 컷",d:"제안 옵션. 인필드 플라이, 보크 같은 룰을 그림 퀴즈로 보여줘요.",f:[["서브 타겟","잘 맞음"],["제작","그림 + 짧은 글"],["검토","부담 적음"]]}]},
  {key:"bottom",q:"왼쪽 아래 작은 칸",title:"그림 아래 작은 칸에는 무엇을 넣을까?",hint:"매달 직접 채우는 칸이 있으면 다꾸 매니아가 더 오래 써요.",opts:[
@@ -371,15 +392,15 @@ var D=[
  {key:"homeaway",q:"홈 · 원정 표시",title:"오늘 경기가 홈인지 원정인지, 어떻게 표시할까?",hint:"기본: 상대팀 스티커를 날짜 칸에 붙여 오늘 누구와 경기하는지 표시해요.",opts:[
    {t:"HOME · AWAY 글자 위에 붙이기",d:"칸마다 HOME · AWAY를 인쇄해 두고, 홈 경기면 AWAY 자리에 상대팀 스티커를 붙여요.",f:[["인쇄","칸마다 글자"],["스티커","추가 없음"],["한눈에","잘 보임"]]},
    {t:"홈 · 원정 스티커 따로",d:"HOME, AWAY 스티커를 따로 만들어 상대팀 스티커 옆에 붙여요.",f:[["인쇄","없음"],["스티커","경기당 2장"],["다꾸","재미있음"]]},
-   {t:"구분하지 않기",d:"상대팀 스티커만 붙여요. 가장 간단하고 칸이 깔끔해요.",f:[["인쇄","없음"],["스티커","경기당 1장"],["정보","홈·원정 없음"]]}]},
- {key:"sticker",q:"경기 결과 스티커",title:"경기 결과 스티커는 어떤 모양으로?",hint:"승 · 패 · 무 · 취소 4종이에요. 상대팀은 로고 스티커로 따로 붙여요.",opts:[
+   {t:"날짜 옆 A · H에 동그라미",d:"날짜 옆에 A(원정) H(홈)를 작게 인쇄해 두고, 펜으로 동그라미를 쳐서 표시해요.",f:[["인쇄","날짜 옆 A H"],["스티커","추가 없음"],["칸 여백","가장 넉넉"]]}]},
+ {key:"sticker",q:"경기 결과 스티커",title:"경기 결과 스티커는 어떤 모양으로?",hint:"승 · 패 · 무 · 취소 4종이에요. 상대팀은 구단명 원형 스티커로 따로 붙여요.",opts:[
    {t:"원형 배지",d:"동그라미 안에 글자 하나. 색으로 바로 구분돼요.",f:[["가독성","높음"],["크기","작게도 잘 보임"]]},
    {t:"손글씨 네모",d:"네모 칸 안에 손글씨. 다꾸 감성이 살아요.",f:[["다꾸 감성","높음"],["가독성","좋음"]]},
    {t:"야구공 표정",d:"이기면 웃고, 지면 화내는 공. 표정만 봐도 결과가 보여요.",f:[["아이 반응","좋음"],["캐릭터화","가능"]]}]},
  {key:"pack",q:"판매 구성",title:"어떻게 묶어서 팔까?",hint:"가격과 마진(목표 20%)에 직접 연결돼요. 원가는 견적 후 확정해요.",opts:[
-   {t:"올인원 한 가지",d:"달력에 지금까지 만든 스티커(상대팀, 경기 결과, 이벤트, 찐팬)를 모두 넣어 한 가지로 팔아요.",f:[["고르기","고민 없음"],["재고","1종"],["가격","하나로 단순"]]},
-   {t:"기본 + 추가 옵션",d:"기본은 달력 + 상대팀·경기 결과 스티커. 이벤트, 찐팬 스티커는 원하는 사람만 추가해요.",f:[["기본가","낮출 수 있음"],["재고","3종"],["객단가","옵션으로 상승"]]},
-   {t:"옵션 2 + 선물용 커버",d:"옵션 2에 선물용 커버를 더하고, 달력 첫 장에 주문자가 쓴 메시지를 넣어 줘요.",f:[["선물 수요","연말 시즌"],["재고","3종 + 커버"],["검토","메시지 인쇄 공정"]]}]},
+   {t:"올인원 한 가지",d:"달력에 지금까지 만든 스티커(상대팀, 경기 결과, 이벤트)를 모두 넣어 한 가지로 팔아요.",f:[["고르기","고민 없음"],["재고","1종"],["가격","하나로 단순"]]},
+   {t:"기본 + 추가 옵션",d:"기본은 달력 + 상대팀·경기 결과 스티커. 이벤트 스티커는 원하는 사람만 추가해요.",f:[["기본가","낮출 수 있음"],["재고","2종"],["객단가","옵션으로 상승"]]},
+   {t:"옵션 2 + 선물용 커버",d:"옵션 2에 선물용 커버를 더하고, 달력 첫 장에 주문자가 쓴 메시지를 넣어 줘요.",f:[["선물 수요","연말 시즌"],["재고","2종 + 커버"],["검토","메시지 인쇄 공정"]]}]},
  {key:"material",q:"종이·스티커 소재",title:"종이와 스티커는 무엇으로? (옵션 더 탐색 필요)",hint:"인쇄소 샘플로 실물을 비교한 뒤 확정해요.",opts:[
    {t:"모조지 + 무광 유포지",d:"필기감 좋은 기본 조합. 펜으로 쓰기 편해요.",f:[["필기감","좋음"],["단가","낮음"],["재부착","불가"]]},
    {t:"고급지 + 리무버블",d:"떼었다 다시 붙일 수 있어 실수해도 괜찮아요.",f:[["다꾸 친화","높음"],["단가","보통"],["재부착","가능"]]},
@@ -428,12 +449,13 @@ function result(style,r,team){
 function cornerMock(o){
   return '<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(7,' style="width:2.1em;height:2.1em"')+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
 }
-var EVENTS=[["개막전","#c8102e"],["올스타","#b8862b"],["가을야구","#d9692b"],["직관","#1c2a4a"],["국제경기","#2f5fc4"]];
+var EVENTS=[["개막전","#c8102e","✦"],["올스타전","#b8862b","★"],["포스트시즌","#d9692b","♛"],["직관","#1c2a4a","♥"],["끝내기","#c8102e","!!"],["완봉","#2f7d4f","0"],["만루홈런","#d9692b","4"],["스윕","#2f5fc4","✓✓✓"],["승요","#e5809b","♥"],["패요","#5d6577","☂"]];
+function evSticker(e,cls){return '<span class="evh'+(cls?" "+cls:"")+'" style="--c:'+e[1]+'"><b>'+e[2]+'</b>'+e[0]+'</span>'}
 var FANS=[["말소","#7d8591"],["등록","#2f7d4f"],["부상","#c8102e"],["대체선수","#6a4fb3"],["FA 영입","#b8862b"],["계약해지","#3a3f4a"],["계약완료","#1c2a4a"],["트레이드","#d9692b"]];
 function eventSheet(){
-  return '<div class="sheetcard"><div class="sh"><span>EVENT STICKER</span><span>기본 5종</span></div><div class="evrow">'+
-    EVENTS.map(function(e){return '<span class="evs" style="--c:'+e[1]+'">'+e[0]+'</span>'}).join("")+'</div>'+
-    '<div class="evcell"><span class="d">3</span><span class="evs sm" style="--c:#c8102e">개막전</span><span class="d2">달력에 붙인 모습</span></div></div>';
+  return '<div class="sheetcard"><div class="sh"><span>EVENT STICKER</span><span>기본 '+EVENTS.length+'종</span></div><div class="evrow">'+
+    EVENTS.map(function(e){return evSticker(e)}).join("")+'</div>'+
+    '<div class="evcell"><span class="d">27</span>'+evSticker(EVENTS[4],"sm")+'<span class="d2">달력에 붙인 모습</span></div></div>';
 }
 function fanSheet(){
   return '<div class="sheetcard"><div class="sh"><span>찐팬 STICKER</span><span>기본 8종 · 이름 칸</span></div><div class="fanrow">'+
@@ -454,7 +476,7 @@ var GAMES=(function(){
   g[10][0]="c";
   return g;
 })();
-var EXTRAS={3:["fan","부상"],5:["ev","직관"],17:["fan","등록"],19:["ev","직관"],24:["fan","트레이드"],29:["fan","말소"]};
+var EXTRAS={5:["ev","직관"],10:["ev","패요"],13:["ev","스윕"],19:["ev","끝내기"],24:["ev","만루홈런"],26:["ev","승요"]};
 function stadiumSvg(c){
   return '<svg viewBox="0 0 120 70" class="art" aria-hidden="true" fill="none" stroke="'+c+'" stroke-width="1.3" stroke-linecap="round">'+
   '<ellipse cx="60" cy="44" rx="50" ry="18"/><ellipse cx="60" cy="42" rx="38" ry="11"/><ellipse cx="60" cy="41" rx="24" ry="6" stroke-dasharray="2 2"/>'+
@@ -474,15 +496,15 @@ function ruleSvg(c,c2){
   '<path d="M40 30 q6 -14 14 -18" stroke-dasharray="2 2"/><circle cx="55" cy="11" r="2.5" fill="#fff"/></svg>';
 }
 function topSlot(n,p){
-  if(n===1) return '<div class="slot top s1">'+stadiumSvg(p.main)+'<span class="cap">6월의 구장</span></div>';
+  if(n===1) return '<div class="slot top s1"><img class="stimg" src="st/jun.png" alt="6월 구장 그림"></div>';
   if(n===2) return '<div class="slot top s2">'+playerSvg(p.main)+'<div class="bio"><b>전설의 에이스</b><i></i><i></i><i></i><i style="width:60%"></i></div></div>';
   return '<div class="slot top s3">'+ruleSvg(p.main,p.accent2)+'<span class="cap">Q. 인필드 플라이?</span></div>';
 }
 function bottomSlot(n,p){
   if(n===1){
-    var first=new Date(2027,6,1).getDay(), h='<div class="mini"><span class="mt">JULY</span><div class="mg">';
-    ["S","M","T","W","T","F","S"].forEach(function(w,i){h+='<span class="'+(i===0?"sun":"")+'">'+w+'</span>'});
-    for(var i=0;i<35;i++){var d=i-first+1;h+='<span class="'+(i%7===0?"sun":"")+'">'+(d>=1&&d<=31?d:"")+'</span>'}
+    var first=(new Date(2027,6,1).getDay()+6)%7, h='<div class="mini"><span class="mt">JULY</span><div class="mg">';
+    ["M","T","W","T","F","S","S"].forEach(function(w,i){h+='<span class="'+(i===6?"sun":"")+'">'+w+'</span>'});
+    for(var i=0;i<35;i++){var d=i-first+1;h+='<span class="'+(i%7===6?"sun":"")+'">'+(d>=1&&d<=31?d:"")+'</span>'}
     return '<div class="slot bot b1">'+h+'</div></div></div>';
   }
   if(n===2) return '<div class="slot bot b2"><span class="lab">이달의 MVP</span><div class="mvp"><span class="frame">★</span><div class="lines"><i></i><i></i></div></div></div>';
@@ -493,7 +515,8 @@ function sidePanel(o,p,focus){
 }
 function sideMock(o,focus){
   var p=MOODS[o.mood];
-  return '<div class="mk" style="'+vars(o.mood)+'"><div class="cal sideonly">'+sidePanel(o,p,focus)+'<div class="peek"></div></div></div>';
+  var peek=(focus==="top"&&o.top===1)?'<div class="peek thumbs"><figure><img src="st/jan.png" alt="1월 전지훈련 그림"><figcaption>1월 · 전지훈련</figcaption></figure><figure><img src="st/dec.png" alt="12월 골든글러브 그림"><figcaption>12월 · 골든글러브</figcaption></figure></div>':'<div class="peek"></div>';
+  return '<div class="mk" style="'+vars(o.mood)+'"><div class="cal sideonly'+(focus==="top"&&o.top===1?" withthumbs":"")+'">'+sidePanel(o,p,focus)+peek+'</div></div>';
 }
 var GAMES=(function(){
   // 2027년 6월: 월요일만 쉬고 매일 경기. 화~목, 금~일 3연전 단위로 상대와 홈/원정이 바뀌어요.
@@ -506,27 +529,28 @@ var GAMES=(function(){
   g[10][0]="c";
   return g;
 })();
-var EXTRAS={3:["fan","부상"],5:["ev","직관"],17:["fan","등록"],19:["ev","직관"],24:["fan","트레이드"],29:["fan","말소"]};
+var EXTRAS={5:["ev","직관"],10:["ev","패요"],13:["ev","스윕"],19:["ev","끝내기"],24:["ev","만루홈런"],26:["ev","승요"]};
 function calMock(o){
   var l=o.layout,m=o.mood,s=o.sticker,p=MOODS[m];
-  var first=new Date(2027,5,1).getDay(), days=30, cells="";
-  ["SUN","MON","TUE","WED","THU","FRI","SAT"].forEach(function(w,i){cells+='<div class="dw'+(i===0?" sun":"")+'">'+w+'</div>'});
+  var first=(new Date(2027,5,1).getDay()+6)%7, days=30, cells="";
+  ["MON","TUE","WED","THU","FRI","SAT","SUN"].forEach(function(w,i){cells+='<div class="dw'+(i===6?" sun":i===5?" sat":"")+'">'+w+'</div>'});
   for(var i=0;i<35;i++){
-    var d=i-first+1, inM=d>=1&&d<=days, sun=i%7===0, stk="", corner="", pos="";
+    var d=i-first+1, inM=d>=1&&d<=days, sun=i%7===6, sat=i%7===5, stk="", corner="", pos="", ahm="";
     if(inM&&GAMES[d]){
       var g=GAMES[d], dot=(d%2?p.main:p.accent2);
       var home=g[2], lg=logo(g[1],' style="width:1.35em;height:1.35em"'), bd='<span class="mini-b">'+badge(s,g[0])+'</span>';
       if(o.homeaway===1){ corner=bd; stk=lg; pos=home?"aw":"hm"; }
       else if(o.homeaway===2){ corner='<span class="hatag" style="background:'+(home?p.main:p.accent2)+';font-size:.42em">'+(home?"HOME":"AWAY")+'</span>'; stk=lg+bd; }
-      else stk=lg+bd;
+      else { stk=lg+bd; ahm='<span class="ah"><i class="'+(home?"":"on")+'">A</i><i class="'+(home?"on":"")+'">H</i></span>'; }
     }
+    else if(inM&&o.homeaway===3) ahm='<span class="ah"><i>A</i><i>H</i></span>';
     var xt="";
     if(inM&&EXTRAS[d]){var e=EXTRAS[d];
-      if(e[0]==="ev"){var ec=(EVENTS.filter(function(x){return x[0]===e[1]})[0]||["","#1c2a4a"])[1]; xt='<span class="xtra"><span class="xev" style="background:'+ec+'">★ '+e[1]+'</span></span>';}
+      if(e[0]==="ev"){var ee=EVENTS.filter(function(x){return x[0]===e[1]})[0]||EVENTS[3]; xt='<span class="xtra">'+evSticker(ee,"xs")+'</span>';}
       else {var fc=(FANS.filter(function(x){return x[0]===e[1]})[0]||["","#7d8591"])[1]; xt='<span class="xtra"><span class="xfan" style="--c:'+fc+'"><b>'+e[1]+'</b><i>○○○</i></span></span>';}
     }
     var printed=(inM&&o.homeaway===1)?'<span class="haw"><i>HOME</i><i>AWAY</i></span>':"";
-    cells+='<div class="dc'+(sun?" sun":"")+'">'+(inM?'<span class="d">'+d+'</span>':"")+printed+(corner?'<span class="rbc">'+corner+'</span>':"")+(stk?'<span class="stk'+(pos?" on-"+pos:"")+'">'+stk+'</span>':"")+xt+'</div>';
+    cells+='<div class="dc'+(sun?" sun":sat?" sat":"")+'">'+(inM?'<span class="d">'+d+ahm+'</span>':"")+printed+(corner?'<span class="rbc">'+corner+'</span>':"")+(stk?'<span class="stk'+(pos?" on-"+pos:"")+'">'+stk+'</span>':"")+xt+'</div>';
   }
   var extra = l===2?'<div class="memo"><span class="lab">한 줄 후기</span><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>'
            : l===3?'<div class="free">자유롭게<br>꾸미는 칸</div>':"";
@@ -538,11 +562,10 @@ function sheetMock(o,wide){
   function sec(t,items){return '<div class="sec"><span class="st">'+t+'</span><div class="items">'+items+'</div></div>'}
   var res=["w","l","d","c","w","l"].map(function(r){return '<span class="mini-b" style="font-size:.62em">'+badge(s,r)+'</span>'}).join("");
   var dots=[p.main,p.main,p.accent2,p.accent2,p.main,p.accent2].map(function(c){return '<span class="dot" style="background:'+c+';width:.8em;height:.8em"></span>'}).join("");
-  var ev=["개막전","올스타","가을야구","직관","국제경기"].map(function(t,i){return '<span class="ev" style="color:'+(i%2?p.main:p.accent2)+'">'+t+'</span>'}).join("");
+  var ev=EVENTS.map(function(e){return evSticker(e,"xs2")}).join("");
   var ha=o.homeaway===2?sec("홈 · 원정",'<span class="hatag" style="background:'+p.main+'">HOME</span><span class="hatag" style="background:'+p.accent2+'">AWAY</span><span class="hatag" style="background:'+p.main+'">HOME</span><span class="hatag" style="background:'+p.accent2+'">AWAY</span>'):"";
   var html=sec("경기 결과",res)+ha+sec("이벤트",ev);
-  html+=sec("찐팬",FANS.slice(0,4).map(function(f){return '<span class="hatag" style="background:'+f[1]+'">'+f[0]+' ___</span>'}).join(""));
-  html+=sec("상대팀 로고",TEAM.map(function(c,i){return logo(i,' style="width:1.5em;height:1.5em"')}).join(""));
+  html+=sec("상대팀 (구단명)",TEAM.map(function(c,i){return logo(i,' style="width:1.5em;height:1.5em"')}).join(""));
   return '<div class="mk" style="'+vars(m)+'"><div class="sheet'+(wide?" wide":"")+'"><div class="sh"><span>STICKER SHEET</span><span></span></div>'+html+'</div></div>';
 }
 function packMock(o){
@@ -553,12 +576,11 @@ function packMock(o){
   }
   var h='<div class="oform"><div class="ohead"><span>주문 화면 예시</span><b>'+(pk===1?"선택 없음 · 한 가지":"고객이 직접 골라요")+'</b></div>';
   if(pk===1){
-    h+=row("올인원 세트","달력 + 상대팀 · 결과 · 이벤트 · 찐팬 스티커","fixed","단일가");
+    h+=row("올인원 세트","달력 + 상대팀 · 결과 · 이벤트 스티커","fixed","단일가");
   } else {
     h+=row("기본 세트","달력 + 상대팀 · 경기 결과 스티커","fixed","기본가");
     h+='<div class="osub">추가 옵션 (원하는 것만 체크)</div>';
-    h+=row("이벤트 스티커","개막전 · 올스타 · 가을야구 …","on","+ 추가금");
-    h+=row("찐팬 스티커","말소 · 등록 · 부상 · 트레이드 …","off","+ 추가금");
+    h+=row("이벤트 스티커","개막전 · 끝내기 · 승요 · 패요 …","on","+ 추가금");
     if(pk===3){
       h+=row("선물용 커버","포장 + 첫 장 메시지","on","+ 추가금");
       h+='<div class="omsg"><span>첫 장 메시지</span><i>To. 아빠, 올해도 같이 직관 가요!</i></div>';
@@ -584,7 +606,7 @@ function haMock(o){
   var inner, cap;
   if(n===1){inner='<div class="words"><span>HOME</span><span class="aw">AWAY<span class="drop">'+opp+'</span></span></div>';cap="홈 경기: AWAY 자리에 상대팀 스티커";}
   else if(n===2){inner='<div class="pair"><span class="drop">'+opp+'</span><span class="drop d2"><span class="hatag" style="background:'+p.main+'">HOME</span></span></div>';cap="상대팀 + HOME 스티커 두 장";}
-  else {inner='<div class="pair"><span class="drop">'+opp+'</span></div>';cap="상대팀 스티커 한 장";}
+  else {inner='<span class="ah14"><i>A</i><i class="on">H</i></span><div class="pair"><span class="drop">'+opp+'</span></div>';cap="홈 경기: H에 펜으로 동그라미";}
   return '<div class="mk" style="'+vars(o.mood)+'"><div class="hacell"><span class="hd14">14</span>'+inner+'</div><span class="hacap">'+cap+'</span></div>';
 }
 function cur(){return {top:v("top"),bottom:v("bottom"),homeaway:v("homeaway"),layout:v("layout"),mood:v("mood"),sticker:v("sticker"),pack:v("pack"),material:v("material")}}
@@ -605,7 +627,7 @@ function cellFigure(){
   '<text x="1" y="3.2" font-size="2.8" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="'+navy+'">14</text>'+
   '<text x="13.2" y="3.4" font-size="1.7" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="#fff"><tspan></tspan></text>'+
   '<rect x="12" y="1.2" width="7" height="4" rx=".8" fill="'+navy+'"/><text x="15.5" y="3.9" text-anchor="middle" font-size="2" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="#fff">HOME</text>'+
-  '<image href="stk/landers.png" x="1.8" y="5.2" width="9" height="9"/>'+
+  '<image href="stk/landers.png" x="1.3" y="4.7" width="10" height="10"/>'+
   '<circle cx="15.3" cy="9.7" r="3" fill="#d6263b" stroke="#fff" stroke-width=".35"/><text x="15.3" y="10.6" text-anchor="middle" font-size="2.4" font-weight="700" fill="#fff" font-family="Noto Sans KR,sans-serif">승</text>'+
   '<rect x="2.25" y="14.6" width="16" height="4.5" rx="2.25" fill="'+red+'"/><text x="10.25" y="17.6" text-anchor="middle" font-size="2.3" font-weight="700" fill="#fff" font-family="Noto Sans KR,sans-serif">★ 개막전</text>'+
   '<g stroke="#8a8f99" stroke-width=".12" fill="#8a8f99" font-size="1.6" font-family="Barlow Condensed,sans-serif">'+
@@ -619,8 +641,7 @@ var stage=document.getElementById("stage");
 function el(h){var t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstChild}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 var LISTS=[
-  {kind:"event",q:"이벤트 스티커",title:"이벤트 스티커, 기본 5종에 무엇을 더할까?",hint:"기본: 개막전, 올스타, 가을야구, 직관, 국제경기.",sheet:eventSheet,label:"더 넣고 싶은 이벤트",ph:"예: 끝내기 홈런, 노히트노런, 은퇴식"},
-  {kind:"fan",q:"찐팬 스티커",title:"찐팬 스티커, 선수 이름을 써넣는 8종",hint:"스티커 뒤쪽 빈칸에 선수 이름을 직접 써요.",sheet:fanSheet,label:"더 넣고 싶은 찐팬 스티커나 의견",ph:"예: 1군 콜업, 데뷔 첫 승, 이름 칸을 더 길게"}
+  {kind:"event",q:"이벤트 스티커",title:"이벤트 스티커, 귀여운 손글씨 기본 10종",hint:"개막전, 올스타전, 포스트시즌, 직관, 끝내기, 완봉, 만루홈런, 스윕, 승요(승리요정), 패요(패배요정).",sheet:eventSheet,label:"더 넣고 싶은 이벤트",ph:"예: 끝내기 홈런, 노히트노런, 은퇴식"}
 ];
 var SLIDES=[{t:"base"},{t:"overview"}];
 D.forEach(function(x){SLIDES.push({t:"d",x:x}); if(x.key==="sticker") LISTS.forEach(function(l){SLIDES.push({t:"list",l:l})})});
@@ -664,12 +685,11 @@ function build(){
         '<h2>날짜 한 칸 약 20 × 19mm, 스티커는 이 크기로</h2><div class="sizegrid"><div style="display:flex;flex-direction:column;gap:1.2cqi;min-width:0">'+
         '<div class="assume"><span class="fact">달력 판형 <b>220 × 150mm 가정</b></span><span class="fact">왼쪽 패널 <b>55mm</b></span><span class="fact">날짜 영역 <b>144 × 118mm</b></span><span class="fact">한 칸 <b>약 20.5 × 19.5mm (6주 달)</b></span><span class="fact">5주 달은 <b>약 20.5 × 23.5mm</b></span></div>'+
         '<table class="stab"><thead><tr><th>스티커</th><th>권장 크기</th><th>시즌 수량 참고</th></tr></thead><tbody>'+
-        '<tr><td>상대팀 로고 <small>(기본)</small></td><td><b>지름 9mm</b></td><td>9개 구단 × 16경기, 구단별 18장</td></tr>'+
+        '<tr><td>상대팀 (구단명 원형) <small>(기본)</small></td><td><b>지름 10mm</b></td><td>9개 구단 × 16경기, 구단별 18장</td></tr>'+
         '<tr><td>경기 결과 <small>(기본)</small></td><td>원형 <b>지름 6mm</b> · 손글씨 <b>8 × 6mm</b> · 야구공 <b>지름 7mm</b></td><td>144경기: 승 · 패 각 80, 무 10, 취소 15</td></tr>'+
         '<tr><td>홈 · 원정 <small>(옵션 2)</small></td><td>태그 <b>7 × 4mm</b> · 옵션 1은 인쇄 글자 높이 2mm</td><td>홈 · 원정 각 75</td></tr>'+
-        '<tr><td>이벤트</td><td><b>16 × 4.5mm</b> 라벨</td><td>종류별 3~10장</td></tr>'+
-        '<tr><td>찐팬 (이름 칸)</td><td><b>18 × 4.5mm</b> (글자 7 + 이름 11mm)</td><td>종류별 5~10장</td></tr>'+
-        '</tbody></table><p class="status">한 칸에 가장 많이 붙는 경우: 상대팀 + 결과 + 이벤트(또는 찐팬) 3장, 홈 · 원정 스티커를 쓰면 4장. 오른쪽 그림처럼 위 줄 17mm, 아래 줄 16mm에 들어가요.</p></div>'+
+        '<tr><td>이벤트 (손글씨)</td><td><b>16 × 5mm</b> 라벨</td><td>10종, 종류별 3~10장</td></tr>'+
+        '</tbody></table><p class="status">한 칸에 가장 많이 붙는 경우: 상대팀 + 결과 + 이벤트 3장, 홈 · 원정 스티커를 쓰면 4장. 오른쪽 그림처럼 위 줄 17mm, 아래 줄 16mm에 들어가요.</p></div>'+
         '<div class="cellfig">'+cellFigure()+'<p>실제 비율로 그린 날짜 한 칸 (6주 달 기준)</p></div></div></div>'+pg(n+1)+'</section>';
     }
     var sec=el(h);
@@ -694,7 +714,7 @@ function rowsHTML(){
     rows.push('<button type="button" class="row" data-go="'+SLIDE_OF[x.key]+'"><span class="n">'+n+'</span><span class="k">'+esc(x.q)+'</span><span class="v'+(c?" done":"")+'">'+(c?"OPTION "+c+" · "+esc(x.opts[c-1].t):"아직 안 정했어요")+'</span></button>');
     if(x.key==="sticker") LISTS.forEach(function(l){
       var k=ideaCount(l.kind); n++;
-      rows.push('<button type="button" class="row" data-go="'+SLIDE_OF["list-"+l.kind]+'"><span class="n">'+n+'</span><span class="k">'+esc(l.q)+'</span><span class="v done">기본 '+(l.kind==="event"?5:8)+'종'+(k?" + 의견 "+k+"개":"")+'</span></button>');
+      rows.push('<button type="button" class="row" data-go="'+SLIDE_OF["list-"+l.kind]+'"><span class="n">'+n+'</span><span class="k">'+esc(l.q)+'</span><span class="v done">기본 '+EVENTS.length+'종'+(k?" + 의견 "+k+"개":"")+'</span></button>');
     });
   });
   return rows.join("");
