@@ -163,7 +163,7 @@ p{margin:0;line-height:1.55}
 .rb1:not(:empty){letter-spacing:-.02em}
 .rb2{min-width:3.4em;height:2.6em;padding:0 .5em;border:.14em solid;border-radius:.35em;background:#fff;font-family:var(--hand);font-weight:700;font-size:1.05em;box-shadow:0 .1em .25em rgba(0,0,0,.18)}
 .face{width:3.4em;height:3.4em;flex:none;filter:drop-shadow(0 .1em .15em rgba(0,0,0,.22))}
-.mini-b{font-size:.42em;display:inline-flex}
+.mini-b{font-size:.28em;display:inline-flex}
 .stage-mock{position:relative}
 .corner{position:absolute;left:.7cqi;bottom:.7cqi;display:flex;flex-direction:column;gap:.3em;align-items:flex-start}
 .ccell{width:7.5em;height:5.2em;background:#f7f5ef;border:1px solid #d6d3c8;border-radius:.25em;position:relative;box-shadow:0 .15em .4em -.15em rgba(0,0,0,.35)}
@@ -278,7 +278,7 @@ p{margin:0;line-height:1.55}
 .dc .stk.on-aw{left:73%}
 .dc .stk.on-hm{left:27%}
 .rbc{position:absolute;right:.15em;top:.12em;display:flex;line-height:0}
-.rbc .mini-b{font-size:.36em}
+.rbc .mini-b{font-size:.27em}
 .xtra{position:absolute;left:0;right:0;bottom:.12em;display:flex;justify-content:center;line-height:1}
 .xev{font-size:.36em;font-weight:700;color:#fff;padding:.25em .55em;border-radius:99px;white-space:nowrap}
 .xfan{display:inline-flex;font-size:.36em;border:.12em solid var(--c);border-radius:.3em;overflow:hidden;background:#fff;white-space:nowrap}
@@ -291,12 +291,13 @@ p{margin:0;line-height:1.55}
 .in{top:5cqi!important}
 @media (max-width:760px){.jump{position:static;display:block;margin:20px 14px -8px auto;font-size:12px;padding:4px 12px}}
 .dw.sat,.dc.sat .d{color:#2f5fc4}
-.dc .d .ah{display:inline-flex;gap:.15em;margin-left:.25em;font-size:.82em;color:var(--p-muted);vertical-align:.05em}
+.ahr{position:absolute;right:.3em;top:.18em;font-family:var(--num);font-weight:600;font-size:.56em;color:var(--p-muted);line-height:1}
+.ah{display:inline-flex;gap:.45em}
 .ah i,.ah14 i{font-style:normal;position:relative;display:inline-block;line-height:1}
-.ah i.on::after,.ah14 i.on::after{content:"";position:absolute;inset:-.28em -.32em;border:.1em solid #c8102e;border-radius:50%;transform:rotate(-8deg)}
-.ah14{position:absolute;left:2.6em;top:.65em;display:flex;gap:.45em;font-family:var(--num);font-weight:700;font-size:1.1em;color:var(--p-muted)}
+.ah i.on::after,.ah14 i.on::after{content:"";position:absolute;left:50%;top:50%;width:1.6em;height:1.6em;border:.1em solid #c8102e;border-radius:50%;transform:translate(-50%,-50%) rotate(-8deg)}
+.ah14{position:absolute;right:.9em;top:.65em;display:flex;gap:.45em;font-family:var(--num);font-weight:700;font-size:1.1em;color:var(--p-muted)}
 @media (prefers-reduced-motion:no-preference){.ah14 i.on::after{animation:circ 3.4s ease-out infinite;clip-path:inset(0 0 0 0)}}
-@keyframes circ{0%,25%{opacity:0;transform:rotate(-8deg) scale(1.4)}38%{opacity:1;transform:rotate(-8deg) scale(1)}90%{opacity:1}100%{opacity:0}}
+@keyframes circ{0%,25%{opacity:0;transform:translate(-50%,-50%) rotate(-8deg) scale(1.4)}38%{opacity:1;transform:translate(-50%,-50%) rotate(-8deg) scale(1)}90%{opacity:1}100%{opacity:0}}
 .stimg{width:100%;height:auto;display:block;border-radius:.2em;mix-blend-mode:multiply}
 .slot.top.s1{padding:0}
 .cal.sideonly.withthumbs{width:24em}
@@ -447,7 +448,7 @@ function result(style,r,team){
   return logo(Math.max(0,TEAM.indexOf(team)),' style="width:1.35em;height:1.35em"')+'<span class="mini-b">'+badge(style,r)+'</span>';
 }
 function cornerMock(o){
-  return '<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(7,' style="width:2.1em;height:2.1em"')+'<span class="mini-b" style="font-size:.62em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
+  return '<div class="corner" style="font-size:.85cqi"><div class="ccell"><span class="d">14</span><span class="cc">'+logo(7,' style="width:2.1em;height:2.1em"')+'<span class="mini-b" style="font-size:.42em">'+badge(o.sticker,"w")+'</span></span></div><span class="ccap">달력에 붙인 모습</span></div>';
 }
 var EVENTS=[["개막전","#c8102e","✦"],["올스타전","#b8862b","★"],["포스트시즌","#d9692b","♛"],["직관","#1c2a4a","♥"],["끝내기","#c8102e","!!"],["완봉","#2f7d4f","0"],["만루홈런","#d9692b","4"],["스윕","#2f5fc4","✓✓✓"],["승요","#e5809b","♥"],["패요","#5d6577","☂"]];
 function evSticker(e,cls){return '<span class="evh'+(cls?" "+cls:"")+'" style="--c:'+e[1]+'"><b>'+e[2]+'</b>'+e[0]+'</span>'}
@@ -550,7 +551,7 @@ function calMock(o){
       else {var fc=(FANS.filter(function(x){return x[0]===e[1]})[0]||["","#7d8591"])[1]; xt='<span class="xtra"><span class="xfan" style="--c:'+fc+'"><b>'+e[1]+'</b><i>○○○</i></span></span>';}
     }
     var printed=(inM&&o.homeaway===1)?'<span class="haw"><i>HOME</i><i>AWAY</i></span>':"";
-    cells+='<div class="dc'+(sun?" sun":sat?" sat":"")+'">'+(inM?'<span class="d">'+d+ahm+'</span>':"")+printed+(corner?'<span class="rbc">'+corner+'</span>':"")+(stk?'<span class="stk'+(pos?" on-"+pos:"")+'">'+stk+'</span>':"")+xt+'</div>';
+    cells+='<div class="dc'+(sun?" sun":sat?" sat":"")+'">'+(inM?'<span class="d">'+d+'</span>':"")+(ahm?'<span class="ahr">'+ahm+'</span>':"")+printed+(corner?'<span class="rbc">'+corner+'</span>':"")+(stk?'<span class="stk'+(pos?" on-"+pos:"")+'">'+stk+'</span>':"")+xt+'</div>';
   }
   var extra = l===2?'<div class="memo"><span class="lab">한 줄 후기</span><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>'
            : l===3?'<div class="free">자유롭게<br>꾸미는 칸</div>':"";
@@ -620,21 +621,55 @@ function mockFor(key,opt){
   return {html:materialMock(o),size:1.7};
 }
 
-function cellFigure(){
-  var navy="#1c2a4a", red="#c8102e";
-  return '<svg viewBox="-6 -5 33 31" role="img" aria-label="20.5 x 19.5mm 날짜 칸 안에 상대팀 9mm, 결과 6mm, 홈 태그 7x4mm, 이벤트 16x4.5mm 스티커 배치">'+
-  '<rect x="0" y="0" width="20.5" height="19.5" fill="#f7f5ef" stroke="#b9b4a6" stroke-width=".15"/>'+
-  '<text x="1" y="3.2" font-size="2.8" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="'+navy+'">14</text>'+
-  '<text x="13.2" y="3.4" font-size="1.7" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="#fff"><tspan></tspan></text>'+
-  '<rect x="12" y="1.2" width="7" height="4" rx=".8" fill="'+navy+'"/><text x="15.5" y="3.9" text-anchor="middle" font-size="2" font-family="Barlow Condensed,sans-serif" font-weight="700" fill="#fff">HOME</text>'+
-  '<image href="stk/landers.png" x="1.3" y="4.7" width="10" height="10"/>'+
-  '<circle cx="15.3" cy="9.7" r="3" fill="#d6263b" stroke="#fff" stroke-width=".35"/><text x="15.3" y="10.6" text-anchor="middle" font-size="2.4" font-weight="700" fill="#fff" font-family="Noto Sans KR,sans-serif">승</text>'+
-  '<rect x="2.25" y="14.6" width="16" height="4.5" rx="2.25" fill="'+red+'"/><text x="10.25" y="17.6" text-anchor="middle" font-size="2.3" font-weight="700" fill="#fff" font-family="Noto Sans KR,sans-serif">★ 개막전</text>'+
-  '<g stroke="#8a8f99" stroke-width=".12" fill="#8a8f99" font-size="1.6" font-family="Barlow Condensed,sans-serif">'+
-  '<line x1="0" y1="-2" x2="20.5" y2="-2"/><line x1="0" y1="-2.6" x2="0" y2="-1.4"/><line x1="20.5" y1="-2.6" x2="20.5" y2="-1.4"/><text x="10.25" y="-2.6" text-anchor="middle" stroke="none">20.5mm</text>'+
-  '<line x1="-2" y1="0" x2="-2" y2="19.5"/><line x1="-2.6" y1="0" x2="-1.4" y2="0"/><line x1="-2.6" y1="19.5" x2="-1.4" y2="19.5"/><text x="-2.8" y="9.75" text-anchor="middle" stroke="none" transform="rotate(-90 -2.8 9.75)">19.5mm</text>'+
-  '<text x="6.3" y="22.3" text-anchor="middle" stroke="none">상대팀 9</text><text x="15.3" y="22.3" text-anchor="middle" stroke="none">결과 6</text><text x="22.6" y="3.8" stroke="none">홈 7×4</text><text x="10.25" y="24.6" text-anchor="middle" stroke="none">이벤트 16 × 4.5</text>'+
-  '</g></svg>';
+function cellFigure(o){
+  var navy="#1c2a4a", red="#c8102e", muted="#8a8f99", F='font-family="Barlow Condensed,sans-serif" font-weight="700"', K='font-family="Noto Sans KR,sans-serif" font-weight="700"';
+  var W=20.5, H=19.5, cy=9.4, g="";
+  g+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#f7f5ef" stroke="#b9b4a6" stroke-width=".15"/>';
+  g+='<text x="1" y="3.3" font-size="2.9" '+F+' fill="'+navy+'">14</text>';
+  // result sticker width by style
+  var rw=o.sticker===2?8:o.sticker===3?7:6, gap=1.2, total=10+gap+rw, x0=(W-total)/2, lx=x0+5, rx=x0+10+gap+rw/2;
+  if(o.homeaway===1){
+    g+='<text x="'+(W*0.27)+'" y="'+(cy+.7)+'" text-anchor="middle" font-size="2" '+F+' fill="'+muted+'">HOME</text><text x="'+(W*0.73)+'" y="'+(cy+.7)+'" text-anchor="middle" font-size="2" '+F+' fill="'+muted+'">AWAY</text>';
+    lx=W*0.73; rx=17.4;
+  } else if(o.homeaway===2){
+    g+='<rect x="12.6" y="1" width="7" height="4" rx=".8" fill="'+navy+'"/><text x="16.1" y="3.75" text-anchor="middle" font-size="2" '+F+' fill="#fff">HOME</text>';
+  } else {
+    g+='<text x="15.6" y="3.2" text-anchor="middle" font-size="2.3" '+F+' fill="'+muted+'">A</text><text x="18.4" y="3.2" text-anchor="middle" font-size="2.3" '+F+' fill="'+muted+'">H</text>';
+    g+='<circle cx="18.4" cy="2.4" r="1.75" fill="none" stroke="'+red+'" stroke-width=".25"/>';
+  }
+  g+='<image href="stk/landers.png" x="'+(lx-5)+'" y="'+(cy-5)+'" width="10" height="10"/>';
+  var ry=o.homeaway===1?3.2:cy;
+  if(o.sticker===1) g+='<circle cx="'+rx+'" cy="'+ry+'" r="3" fill="#d6263b" stroke="#fff" stroke-width=".35"/><text x="'+rx+'" y="'+(ry+.85)+'" text-anchor="middle" font-size="2.4" '+K+' fill="#fff">승</text>';
+  else if(o.sticker===2) g+='<rect x="'+(rx-4)+'" y="'+(ry-3)+'" width="8" height="6" rx=".7" fill="#fff" stroke="#d6263b" stroke-width=".35"/><text x="'+rx+'" y="'+(ry+.8)+'" text-anchor="middle" font-size="2.3" font-family="Gaegu,sans-serif" font-weight="700" fill="#d6263b">승!</text>';
+  else g+='<circle cx="'+rx+'" cy="'+ry+'" r="3.5" fill="#fff" stroke="#d4d4d4" stroke-width=".15"/><path d="M'+(rx-1.6)+' '+(ry-.6)+' q.6 -.8 1.2 0 M'+(rx+.4)+' '+(ry-.6)+' q.6 -.8 1.2 0" stroke="#2b2b2b" stroke-width=".25" fill="none"/><path d="M'+(rx-1.3)+' '+(ry+.6)+' Q'+rx+' '+(ry+2.2)+' '+(rx+1.3)+' '+(ry+.6)+' Z" fill="#2b2b2b"/>';
+  var ex=(W-16)/2, ey=14.4;
+  g+='<rect x="'+ex+'" y="'+ey+'" width="16" height="4.5" rx="1.2" fill="#fffdf7" stroke="'+red+'" stroke-width=".22" stroke-dasharray=".6 .4"/>';
+  g+='<circle cx="'+(ex+2.4)+'" cy="'+(ey+2.25)+'" r="1.35" fill="'+red+'"/><text x="'+(ex+2.4)+'" y="'+(ey+2.85)+'" text-anchor="middle" font-size="1.6" '+F+' fill="#fff">!!</text>';
+  g+='<text x="'+(ex+9.2)+'" y="'+(ey+3.2)+'" text-anchor="middle" font-size="2.6" font-family="Gaegu,sans-serif" font-weight="700" fill="'+red+'">끝내기</text>';
+  var rlab=o.sticker===2?"결과 8×6":o.sticker===3?"결과 7":"결과 6";
+  g+='<g stroke="#8a8f99" stroke-width=".12" fill="#8a8f99" font-size="1.6" font-family="Barlow Condensed,Noto Sans KR,sans-serif">'+
+    '<line x1="0" y1="-2" x2="'+W+'" y2="-2"/><line x1="0" y1="-2.6" x2="0" y2="-1.4"/><line x1="'+W+'" y1="-2.6" x2="'+W+'" y2="-1.4"/><text x="'+(W/2)+'" y="-2.6" text-anchor="middle" stroke="none">20.5mm</text>'+
+    '<line x1="-2" y1="0" x2="-2" y2="'+H+'"/><line x1="-2.6" y1="0" x2="-1.4" y2="0"/><line x1="-2.6" y1="'+H+'" x2="-1.4" y2="'+H+'"/><text x="-2.8" y="'+(H/2)+'" text-anchor="middle" stroke="none" transform="rotate(-90 -2.8 '+(H/2)+')">19.5mm</text>'+
+    '<text x="'+lx+'" y="22.2" text-anchor="middle" stroke="none">상대팀 10</text><text x="22.4" y="'+(ry+.6)+'" stroke="none">'+rlab+'</text><text x="'+(W/2)+'" y="24.5" text-anchor="middle" stroke="none">이벤트 16 × 4.5</text>'+
+    (o.homeaway===3?'<text x="22.4" y="3" stroke="none">A H 인쇄</text>':o.homeaway===2?'<text x="22.4" y="3.6" stroke="none">홈 7×4</text>':'')+
+    '</g>';
+  return '<svg viewBox="-6 -5 36 31" role="img" aria-label="20.5 x 19.5mm 날짜 칸에 고른 조합대로 스티커를 붙인 모습">'+g+'</svg>';
+}
+function sizeBody(o){
+  var res=o.sticker===2?'손글씨 네모 <b>8 × 6mm</b>':o.sticker===3?'야구공 <b>지름 7mm</b>':'원형 <b>지름 6mm</b>';
+  var ha=o.homeaway===1?['홈 · 원정 <small>(글자 위에 붙이기)</small>','칸마다 HOME · AWAY 인쇄, 글자 높이 <b>2mm</b>','스티커 없음']:
+         o.homeaway===2?['홈 · 원정 <small>(스티커)</small>','태그 <b>7 × 4mm</b>','홈 · 원정 각 75']:
+                        ['홈 · 원정 <small>(A · H 동그라미)</small>','날짜 옆 A H 인쇄, 글자 높이 <b>2.3mm</b> · 펜 동그라미 지름 약 3.5mm','스티커 없음'];
+  var most=o.homeaway===2?'상대팀 + 결과 + 이벤트 + 홈 태그 4장':'상대팀 + 결과 + 이벤트 3장';
+  return '<div style="display:flex;flex-direction:column;gap:1.2cqi;min-width:0">'+
+    '<div class="assume"><span class="fact">달력 판형 <b>220 × 150mm 가정</b></span><span class="fact">왼쪽 패널 <b>55mm</b></span><span class="fact">날짜 영역 <b>144 × 118mm</b></span><span class="fact">한 칸 <b>약 20.5 × 19.5mm (6주 달)</b></span><span class="fact">5주 달은 <b>약 20.5 × 23.5mm</b></span></div>'+
+    '<table class="stab"><thead><tr><th>스티커</th><th>권장 크기</th><th>시즌 수량 참고</th></tr></thead><tbody>'+
+    '<tr><td>상대팀 <small>(구단명 원형)</small></td><td><b>지름 10mm</b></td><td>9개 구단 × 16경기, 구단별 18장</td></tr>'+
+    '<tr><td>경기 결과</td><td>'+res+'</td><td>144경기: 승 · 패 각 80, 무 10, 취소 15</td></tr>'+
+    '<tr><td>'+ha[0]+'</td><td>'+ha[1]+'</td><td>'+ha[2]+'</td></tr>'+
+    '<tr><td>이벤트 <small>(손글씨)</small></td><td><b>16 × 4.5mm</b> 라벨</td><td>10종, 종류별 3~10장</td></tr>'+
+    '</tbody></table><p class="status">지금 고른 조합 기준이에요. 한 칸에 가장 많이 붙는 경우는 '+most+'. 상대팀과 결과를 가운데 한 줄로, 이벤트는 아래 줄에 붙이면 6주 달 칸에도 들어가요.</p></div>'+
+    '<div class="cellfig">'+cellFigure(o)+'<p>고른 조합대로 실제 비율로 그린 날짜 한 칸 (6주 달 기준)</p></div>';
 }
 /* ---------- slides ---------- */
 var stage=document.getElementById("stage");
@@ -682,15 +717,7 @@ function build(){
         '<div class="preview col" id="sumPrev"></div></div></div>'+pg(n+1)+'</section>';
     } else {
       h='<section class="slide"><div class="in"><div class="top"><span class="eyebrow">Size Guide · 크기 예측</span><span class="hint">예측치예요. 인쇄소 규격과 샘플 출력으로 확정해요.</span></div>'+
-        '<h2>날짜 한 칸 약 20 × 19mm, 스티커는 이 크기로</h2><div class="sizegrid"><div style="display:flex;flex-direction:column;gap:1.2cqi;min-width:0">'+
-        '<div class="assume"><span class="fact">달력 판형 <b>220 × 150mm 가정</b></span><span class="fact">왼쪽 패널 <b>55mm</b></span><span class="fact">날짜 영역 <b>144 × 118mm</b></span><span class="fact">한 칸 <b>약 20.5 × 19.5mm (6주 달)</b></span><span class="fact">5주 달은 <b>약 20.5 × 23.5mm</b></span></div>'+
-        '<table class="stab"><thead><tr><th>스티커</th><th>권장 크기</th><th>시즌 수량 참고</th></tr></thead><tbody>'+
-        '<tr><td>상대팀 (구단명 원형) <small>(기본)</small></td><td><b>지름 10mm</b></td><td>9개 구단 × 16경기, 구단별 18장</td></tr>'+
-        '<tr><td>경기 결과 <small>(기본)</small></td><td>원형 <b>지름 6mm</b> · 손글씨 <b>8 × 6mm</b> · 야구공 <b>지름 7mm</b></td><td>144경기: 승 · 패 각 80, 무 10, 취소 15</td></tr>'+
-        '<tr><td>홈 · 원정 <small>(옵션 2)</small></td><td>태그 <b>7 × 4mm</b> · 옵션 1은 인쇄 글자 높이 2mm</td><td>홈 · 원정 각 75</td></tr>'+
-        '<tr><td>이벤트 (손글씨)</td><td><b>16 × 5mm</b> 라벨</td><td>10종, 종류별 3~10장</td></tr>'+
-        '</tbody></table><p class="status">한 칸에 가장 많이 붙는 경우: 상대팀 + 결과 + 이벤트 3장, 홈 · 원정 스티커를 쓰면 4장. 오른쪽 그림처럼 위 줄 17mm, 아래 줄 16mm에 들어가요.</p></div>'+
-        '<div class="cellfig">'+cellFigure()+'<p>실제 비율로 그린 날짜 한 칸 (6주 달 기준)</p></div></div></div>'+pg(n+1)+'</section>';
+        '<h2>날짜 한 칸 약 20 × 19mm, 스티커는 이 크기로</h2><div class="sizegrid" id="sizeBody"></div></div>'+pg(n+1)+'</section>';
     }
     var sec=el(h);
     if(S.t!=="sum"){var jb=document.createElement("button");jb.type="button";jb.className="jump";jb.textContent="☰ 고른 조합 보기";jb.setAttribute("aria-label","고른 조합 페이지로 이동");jb.addEventListener("click",function(e){e.stopPropagation();show(SLIDES.findIndex(function(x){return x.t==="sum"}))});sec.insertBefore(jb,sec.firstChild)}
@@ -745,6 +772,7 @@ function render(){
   var note=document.getElementById("note"); if(document.activeElement!==note) note.value=state.note||"";
   document.getElementById("st0").textContent=done+"/"+D.length+" 결정 · 정하지 않은 항목은 OPTION 1로 미리 보여요.";
   [].forEach.call(dots.children,function(x,k){var S=SLIDES[k];x.classList.toggle("done",!!(S&&S.t==="d"&&state[S.x.key]))});
+  var sb=document.getElementById("sizeBody"); if(sb) sb.innerHTML=sizeBody(o);
   renderIdeas();
 }
 function choose(k,o){state[k]=state[k]===o?null:o; render(); persist()}
